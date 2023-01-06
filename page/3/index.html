@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LemonGo97のBlog - 分享技术，源于生活</title><meta name="description" content="分享一切与技术相关的文章，包括但不限于Java,Linux"><meta name="keywords" content="Java,Linux,BigData,MySQL,MongoDB"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/page/3/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="website"><meta property="og:title" content="LemonGo97のBlog"><meta property="og:url" content="https://blog.lemongo97.com/page/3/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="分享一切与技术相关的文章，包括但不限于Java,Linux"><meta property="og:image" content="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0"><meta property="article:published_time" content="2023-01-06T02:30:11.416Z"><meta property="article:modified_time" content="2023-01-06T02:30:11.416Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: false,
+  isHome: true,
+  isHighlightShrink: false,
+  isSidebar: false,
+  postUpdate: '2023-01-06 10:30:11'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">33</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">28</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><header class="full_page" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/background.jpg)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="site-info"><h1 id="site_title">LemonGo97のBlog</h1><div id="site_subtitle"><span id="subtitle"></span></div></div><div id="scroll_down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout_page" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/bb75348e/" title="【转载】 Curator使用教程">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201225124820.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 Curator使用教程"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/bb75348e/" title="【转载】 Curator使用教程">【转载】 Curator使用教程</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-12-25T03:02:05.000Z" title="发表于 2020-12-25 11:02:05">2020-12-25</time></span></div><div class="content">Zookeeper客户端Curator使用详解
+本文转载自 http://www.throwable.club/2018/12/16/zookeeper-curator-usage/
+著作权归原作者所有
+
+简介Curator是Netflix公司开源的一套zookeeper客户端框架，解决了很多Zookeeper客户端非常底层的细节开发工作，包括连接重连、反复注册Watcher和NodeExistsException异常等等。Patrixck Hunt（Zookeeper）以一句“Guava is to Java that Curator to Zookeeper”给Curator予高度评价。
+引子和趣闻：Zookeeper名字的由来是比较有趣的，下面的片段摘抄自《从PAXOS到ZOOKEEPER分布式一致性原理与实践》一书：
+Zookeeper最早起源于雅虎的研究院的一个研究小组。在当时，研究人员发现，在雅虎内部很多大型的系统需要依赖一个类似的系统进行分布式协调，但是这些系统往往存在分布式单点问题。所以雅虎的开发人员就试图开发一个通用的无单点问题的分布式协调框架。在立项初期，考虑到很多 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/7de3e7aa/" title="Curator实现Zookeeper注册中心（官方文档翻译）">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201225124820.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Curator实现Zookeeper注册中心（官方文档翻译）"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/7de3e7aa/" title="Curator实现Zookeeper注册中心（官方文档翻译）">Curator实现Zookeeper注册中心（官方文档翻译）</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-12-24T07:33:53.000Z" title="发表于 2020-12-24 15:33:53">2020-12-24</time></span></div><div class="content">服务发现什么是服务发现？在SOA /分布式系统中，服务需要相互查找。 也就是说，Web服务可能需要找到缓存服务，等等。DNS可以用于此目的，但是对于不断变化的服务而言，它还远远不够灵活。 服务发现系统提供了以下机制：
+
+服务以记录其可用性
+查找特定服务的单个实例
+通知服务实例何时更改
+
+Curator 服务发现服务实例 ( ServiceInstance )服务实例由类 ServiceInstance 表示。 ServiceInstance 具有名称，ID，地址，端口和/或SSL端口，以及可选的有效负载（用户定义）。 ServiceInstance通过以下方式序列化并存储在 ZooKeeper 中：
+12345678910base path       |_______ service A name                    |__________ instance 1 id --&gt; (serialized ServiceInstance)                    |__________ instance 2 id --&gt; (serialized  ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/a10ff556/" title="【转载】 Linux中检查本地系统上的开放端口列表的方法">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124192103.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 Linux中检查本地系统上的开放端口列表的方法"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/a10ff556/" title="【转载】 Linux中检查本地系统上的开放端口列表的方法">【转载】 Linux中检查本地系统上的开放端口列表的方法</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-24T10:47:49.000Z" title="发表于 2020-11-24 18:47:49">2020-11-24</time></span></div><div class="content">Linux中检查本地系统上的开放端口列表的方法在 Linux 中 如果想要查看本地系统上的开放端口，一般使用以下几种命令进行查看
+本文转载自 Linux中国 。原文链接：Linux中检查本地系统上的开放端口列表的方法
+你可以使用以下四个命令来完成这个工作。这些命令是非常出名的并被 Linux 管理员广泛使用。
+netstat：netstat (“network statistics”) 是一个显示网络连接（进和出）相关信息命令行工具，例如：路由表, 伪装连接,多点传送成员和网络端口。
+nmap：Nmap (“Network Mapper”) 是一个网络探索与安全审计的开源工具。它旨在快速扫描大型网络。
+ss： ss 被用于转储套接字统计信息。它也可以类似 netstat 使用。相比其他工具它可以展示更多的TCP状态信息。
+lsof： lsof 是 List Open File 的缩写. 它用于输出被某个进程打开的所有文件。
+如何使用 Linux 命令 netstat 检查系统中的开放端口列表它可以列出所有的 tcp、udp 连接和所有的 unix 套接字连接。
+它用于发现发现网络问题， ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/ccf4c8c4/" title="ElasticSearch 查询语法">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124191809.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ElasticSearch 查询语法"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/ccf4c8c4/" title="ElasticSearch 查询语法">ElasticSearch 查询语法</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-24T10:41:57.000Z" title="发表于 2020-11-24 18:41:57">2020-11-24</time></span></div><div class="content">ElasticSearch 查询语法SearchTimeout
+设置： 默认没有 timeout ， 如果设置了 timeout ，那么会执行 timeout 机制
+timeout 机制：假设用户查询结果有 1W 条数据，但是需要 10’’ 才能查询完毕，但是用户设置了 1s的 timeout, 那么不管当前一共查询到了多少数据，都会在 1s 后 ES 将停止查询，并返回当前数据。
+用法：GET /_search?timeout=1s/ms/m
+
+ES 常用查询
+Query String:
+
+查询所有：GET /product/_search
+带参数：GET /product/_search?q=name:xiaomi
+分页：GET /product/_search?from=0&amp;size=2&amp;sort=price:asc
+
+
+Query DSL:
+
+match_all: 匹配所有
+123456GET /product/_search&#123;  "query":&#123;    "match_all": &#123;&#125;  &#125;&#125;
+
+ma ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/80f71596/" title="ElasticSearch分布式文档系统">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124191809.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ElasticSearch分布式文档系统"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/80f71596/" title="ElasticSearch分布式文档系统">ElasticSearch分布式文档系统</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-24T10:41:49.000Z" title="发表于 2020-11-24 18:41:49">2020-11-24</time></span></div><div class="content">ES 分布式文档系统1. ES 如何实现高可用（生产环境均为一台机器一个节点）
+ES 在分配单个索引的分片时会将每个分片尽可能分配到更多的节点上。但是，实际情况取决于集群拥有的分片和索引的数量以及他们的大小，不一定总是能均匀的分布
+ES 不允许 Primary 和它的 Replica 放在同一个节点中，并且同一个节点不接受完全相同的两个 Replica
+同一个节点允许多个索引的分片同时存在
+
+2. 容错机制
+什么是容错
+
+傻x的代码你可以看懂，牛x的代码你也能看懂
+只能看懂自己的代码，容错性低
+PS： 各种情况（支持的情况越多，容错性越好）下，都能保证 work 正常运行
+换到 ES 上就是，再局部出错异常的情况下，保证服务正常运行并且有自行恢复能力。
+
+
+ES-node
+
+两个配置： node.master 和 node.data
+
+node.master = true            node.data = true
+这是ES 节点默认配置，即作为候选节点又作为数据节点，这样的节点一旦被选举为 Master，压力是比较大的，通常来说 Master 节点应该只承担较为轻量级的任 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/97a9c70e/" title="ElasticSearch集群安装，搭建以及简单的CURD">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124191809.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ElasticSearch集群安装，搭建以及简单的CURD"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/97a9c70e/" title="ElasticSearch集群安装，搭建以及简单的CURD">ElasticSearch集群安装，搭建以及简单的CURD</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-24T10:41:39.000Z" title="发表于 2020-11-24 18:41:39">2020-11-24</time></span></div><div class="content">ES集群安装，搭建以及简单的CURD1. 安装环境1. 安装ES
+ES的开发模式和生产模式
+
+开发模式：默认配置（未配置发现设置），用于学习阶段
+生产模式：会触发ES的引导检查，学习阶段不建议修改集群相关配置
+
+
+
+JDK -&gt; 依赖
+
+下载 -&gt; elastic.co
+
+启动 -&gt; ./elasticsearch -d
+
+-d 后台启动
+
+
+验证 -&gt; http://localhost:9200/
+
+
+2. 安装Kibana
+从6.0.0 版本开始，Kibana仅支持64位操作系统
+
+
+下载：elastic.co
+
+启动：依然是开箱即用
+
+Linux: ./kibana
+Windows: ./kibana
+
+
+验证：http://localhost:5601/
+
+
+2. 集群健康值检查1. 健康值检查
+_cat/health
+_cluster/health
+
+2. 健康值状态
+Green：所有 Primary 和 Replica 均为 active ，集群健康
+Yellow：至少一个 Replica 不可用，但所有 Primary 均为 active ，数据仍 ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/8f9d7b23/" title="ElasticSearch核心概念">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124191809.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ElasticSearch核心概念"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/8f9d7b23/" title="ElasticSearch核心概念">ElasticSearch核心概念</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-24T10:41:30.000Z" title="发表于 2020-11-24 18:41:30">2020-11-24</time></span></div><div class="content">Elasticsearch 核心概念1. 什么是搜索百度、垂直搜索（站内搜索）
+搜索：通过一个关键词或一段描述，得到你想要的（相关度高）的结果
+2. 如何实现搜索功能关系型数据库：性能差、不可靠、结果不准确（相关度低）
+3.倒排索引、Lucene 和全文检索#1. 倒排索引的数据结构
+包含这个关键词的 document list
+关键词在每个doc中出现的次数 TF term frequency
+关键词在整个索引中出现的次数 IDF inverse doc frequency
+关键词在当前doc中出现的次数
+每个doc 的长度，越长相关度越低
+包含这个关键词的所有doc 的平均长度
+
+#2. Lucene:jar包，帮我们创建倒排索引，提供了复杂的API
+#3. 如果用 Lucene 做集群实现搜索，会有那些问题
+节点如果宕机，节点数据丢失，后果不堪设想，可用性差
+自己维护，麻烦（自己创建、管理索引），单台节点的承载请求的能力是有限的，需要人工来做负载（雨露均沾）
+
+#4. Elasticsearch
+分布式、高性能、高可用、可伸缩、易维护、ES≠搜索引擎
+
+
+分布式的搜索、存储和数据 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/7a6cb371/" title="一个简单的页面分页显隐算法">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/timothy-meinberg-b079C-_tUbM-unsplash.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="一个简单的页面分页显隐算法"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/7a6cb371/" title="一个简单的页面分页显隐算法">一个简单的页面分页显隐算法</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-23T10:59:14.000Z" title="发表于 2020-11-23 18:59:14">2020-11-23</time></span></div><div class="content">前言一天，前端同学找我，说页面的分页组件算法应该怎么写，他已经写懵了，并且找了 Element 组件的源码查看分页组件，发现Element 分页组件移植过来有些问题，而且 Element 分页组件的算法很烂。然后我就写了一个分页算法出来
+实现过程原理原理很简单，就是通过计算开始渲染和结束渲染的盒子下标，然后除最小页码和最大页码外，此外的，均不进行渲染
+JavaScript 实现方式鄙人 Js 学的很烂，求轻喷。。。。😀
+12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667// 常量：总共页面显示的盒子数var SHOW_PAGE_NUM = 9;// 常量：当选中中间页码，前后渲染的盒子数量var CENTER_AROUND_NUM = 3;// 执行方法function main() &#123;    // 当前页码    let position = 1;    // 总页数     ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/34ad406f/" title="HBase 集群安装">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20200915180256.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="HBase 集群安装"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/34ad406f/" title="HBase 集群安装">HBase 集群安装</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-09-15T09:14:43.000Z" title="发表于 2020-09-15 17:14:43">2020-09-15</time></span></div><div class="content">Hbase 安装以三台机器搭建集群环境为例
+12345hbase1 10.10.3.129hbase2 10.10.3.130hbase3 10.10.3.131
+
+环境创建相关用户
+三台机器操作方式相同
+
+创建zookeeper、Hbase、Hadoop用户,并设置密码
+123456[root@localhost opt]# useradd zookeeper[root@localhost opt]# passwd zookeeper[root@localhost opt]# useradd hadoop[root@localhost opt]# passwd hadoop[root@localhost opt]# useradd hbase[root@localhost opt]# passwd hbase
+
+将此三个用户加入到 sudoers 中
+1[root@localhost ~]# vim /etc/sudoers
+
+
+
+Hosts 与 免密
+三台机器操作方式相同
+
+编辑hosts
+1[root@localhost opt]# vim &#x2F;etc&#x2F;host ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/6d9855d0/" title="Druid SQL解析工具的使用">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20200804141920.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Druid SQL解析工具的使用"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/6d9855d0/" title="Druid SQL解析工具的使用">Druid SQL解析工具的使用</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-08-03T02:57:58.000Z" title="发表于 2020-08-03 10:57:58">2020-08-03</time></span></div><div class="content">前言最近在项目运行过程中，需要对标准SQL进行解析，然后对SQL进行改写，在各种查找对比后选中了Alibaba Druid来进行解析SQL（如非特制，以下均简称 Druid）
+Druid官方的wiki说的还算明白，但可惜的是没有相关API文档。
+官方文档1. SQL Parser如需查看原文：SQL Parser
+1. 简介SQL Parser是Druid的一个重要组成部分，Druid内置使用SQL Parser来实现防御SQL注入（WallFilter）、合并统计没有参数化的SQL(StatFilter的mergeSql)、SQL格式化、分库分表。
+1.1. 和Antlr生成Parser的区别和Antlr生成的SQL有很大不同的是，Druid SQL Parser性能非常好，可以用于生产环境直接对SQL进行分析处理。
+1.2. Druid SQL Parser的使用场景
+MySql SQL全量统计
+Hive/ODPS SQL执行安全审计
+分库分表SQL解析引擎
+数据库引擎的SQL Parser
+
+2. 各种语法支持Druid的sql parser是目前支持各种数据语法最完备的SQL  ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/2/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">LemonGo97</div><div class="author-info__description">分享一切与技术相关的文章，包括但不限于Java,Linux</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives"><div class="headline">文章</div><div class="length_num">33</div></a></div><div class="card-info-data-item is-center">      <a href="/tags"><div class="headline">标签</div><div class="length_num">28</div></a></div><div class="card-info-data-item is-center"><a href="/categories"><div class="headline">分类</div><div class="length_num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LemonGo97"><i class="fab fa-github"></i><span>Follow Me</span></a></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">分享技术，阅读</div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-recent-item"><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/a414d800/" title="【转载】 Kubernetes原理与架构初探"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 Kubernetes原理与架构初探"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/a414d800/" title="【转载】 Kubernetes原理与架构初探">【转载】 Kubernetes原理与架构初探</a><time class="aside-post_meta post-meta-date" datetime="2023-01-05T09:37:46.000Z" title="发表于 2023-01-05 17:37:46">2023-01-05</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/6cf05f2f/" title="【转载】 Firewalld 防火墙示例，完整的入门指南"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 Firewalld 防火墙示例，完整的入门指南"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/6cf05f2f/" title="【转载】 Firewalld 防火墙示例，完整的入门指南">【转载】 Firewalld 防火墙示例，完整的入门指南</a><time class="aside-post_meta post-meta-date" datetime="2023-01-05T09:19:46.000Z" title="发表于 2023-01-05 17:19:46">2023-01-05</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/cffb64f7/" title="Kubernetes 集群安装记录"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes 集群安装记录"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/cffb64f7/" title="Kubernetes 集群安装记录">Kubernetes 集群安装记录</a><time class="aside-post_meta post-meta-date" datetime="2022-12-20T03:31:07.000Z" title="发表于 2022-12-20 11:31:07">2022-12-20</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/15ab9f73/" title="【转载】 从0到1详解ZooKeeper的应用场景及架构"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/all_default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 从0到1详解ZooKeeper的应用场景及架构"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/15ab9f73/" title="【转载】 从0到1详解ZooKeeper的应用场景及架构">【转载】 从0到1详解ZooKeeper的应用场景及架构</a><time class="aside-post_meta post-meta-date" datetime="2022-05-23T07:21:21.000Z" title="发表于 2022-05-23 15:21:21">2022-05-23</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/9c1530a2/" title="【转载】 Elasticsearch 基础入门详文"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/all_default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 Elasticsearch 基础入门详文"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/9c1530a2/" title="【转载】 Elasticsearch 基础入门详文">【转载】 Elasticsearch 基础入门详文</a><time class="aside-post_meta post-meta-date" datetime="2022-05-08T14:58:32.000Z" title="发表于 2022-05-08 22:58:32">2022-05-08</time></div></div></div></div></div><div class="card-widget card-categories"><div class="card-content"><div class="item-headline"><i class="fas fa-folder-open"></i><span>分类</span></div><ul class="card-category-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Java-%E7%BC%96%E7%A8%8B%E7%9B%B8%E5%85%B3/"><span class="card-category-list-name">Java 编程相关</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3/"><span class="card-category-list-name">数据库相关</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"><span class="card-category-list-name">源码分析</span><span class="card-category-list-count">3</span></a></li>
+                       
+            </ul></div></div><div class="card-widget card-tags"><div class="card-content"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/Curator/" style="font-size: 17.2px; color: #999ca1">Curator</a> <a href="/tags/Druid/" style="font-size: 16px; color: #999">Druid</a> <a href="/tags/ElasticSearch/" style="font-size: 20.8px; color: #99a6b7">ElasticSearch</a> <a href="/tags/Git/" style="font-size: 16px; color: #999">Git</a> <a href="/tags/HBase/" style="font-size: 16px; color: #999">HBase</a> <a href="/tags/Hadoop/" style="font-size: 16px; color: #999">Hadoop</a> <a href="/tags/Java/" style="font-size: 22px; color: #99a9bf">Java</a> <a href="/tags/JavaScript/" style="font-size: 16px; color: #999">JavaScript</a> <a href="/tags/Kubernetes/" style="font-size: 16px; color: #999">Kubernetes</a> <a href="/tags/Linux/" style="font-size: 19.6px; color: #99a3b0">Linux</a> <a href="/tags/MongoDB/" style="font-size: 17.2px; color: #999ca1">MongoDB</a> <a href="/tags/Nginx/" style="font-size: 16px; color: #999">Nginx</a> <a href="/tags/Redis/" style="font-size: 17.2px; color: #999ca1">Redis</a> <a href="/tags/SQL/" style="font-size: 17.2px; color: #999ca1">SQL</a> <a href="/tags/SSL/" style="font-size: 16px; color: #999">SSL</a> <a href="/tags/Shell/" style="font-size: 16px; color: #999">Shell</a> <a href="/tags/TCP/" style="font-size: 16px; color: #999">TCP</a> <a href="/tags/Zookeeper/" style="font-size: 19.6px; color: #99a3b0">Zookeeper</a> <a href="/tags/firewalld/" style="font-size: 16px; color: #999">firewalld</a> <a href="/tags/java/" style="font-size: 16px; color: #999">java</a> <a href="/tags/kubernetes/" style="font-size: 16px; color: #999">kubernetes</a> <a href="/tags/zookeeper/" style="font-size: 16px; color: #999">zookeeper</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 17.2px; color: #999ca1">分布式</a> <a href="/tags/%E5%88%86%E9%A1%B5/" style="font-size: 16px; color: #999">分页</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 16px; color: #999">数据结构</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/" style="font-size: 16px; color: #999">注册中心</a> <a href="/tags/%E6%BA%90%E7%A0%81/" style="font-size: 18.4px; color: #999fa8">源码</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.2px; color: #999ca1">算法</a></div></div></div><div class="card-widget card-archives"><div class="card-content"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/01/"><span class="card-archive-list-date">一月 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/12/"><span class="card-archive-list-date">十二月 2022</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/05/"><span class="card-archive-list-date">五月 2022</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/04/"><span class="card-archive-list-date">四月 2022</span><span class="card-archive-list-count">8</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/02/"><span class="card-archive-list-date">二月 2021</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/01/"><span class="card-archive-list-date">一月 2021</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/12/"><span class="card-archive-list-date">十二月 2020</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/11/"><span class="card-archive-list-date">十一月 2020</span><span class="card-archive-list-count">6</span></a></li><li class="card-archive-list-item more is-center"><a class="card-archive-list-link-more" href="/archives">
+              <span>查看更多</span><i class="fas fa-angle-right"  ></i></a></li></ul></div></div><div class="card-widget card-webinfo"><div class="card-content"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="webinfo-article-name">文章数目 :</div><div class="webinfo-article-count">33</div></div></div></div></div></div></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"></div></div></body></html>
