@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LemonGo97のBlog - 分享技术，源于生活</title><meta name="description" content="分享一切与技术相关的文章，包括但不限于Java,Linux"><meta name="keywords" content="Java,Linux,BigData,MySQL,MongoDB"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/page/5/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="website"><meta property="og:title" content="LemonGo97のBlog"><meta property="og:url" content="https://blog.lemongo97.com/page/5/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="分享一切与技术相关的文章，包括但不限于Java,Linux"><meta property="og:image" content="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0"><meta property="article:published_time" content="2023-01-07T16:21:55.929Z"><meta property="article:modified_time" content="2023-01-07T16:21:55.929Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: false,
+  isHome: true,
+  isHighlightShrink: false,
+  isSidebar: false,
+  postUpdate: '2023-01-08 00:21:55'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">47</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">33</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><header class="full_page" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/background.jpg)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="site-info"><h1 id="site_title">LemonGo97のBlog</h1><div id="site_subtitle"><span id="subtitle"></span></div></div><div id="scroll_down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout_page" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/8f9d7b23/" title="ElasticSearch核心概念">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124191809.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ElasticSearch核心概念"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/8f9d7b23/" title="ElasticSearch核心概念">ElasticSearch核心概念</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-24T10:41:30.000Z" title="发表于 2020-11-24 18:41:30">2020-11-24</time></span></div><div class="content">Elasticsearch 核心概念1. 什么是搜索百度、垂直搜索（站内搜索）
+搜索：通过一个关键词或一段描述，得到你想要的（相关度高）的结果
+2. 如何实现搜索功能关系型数据库：性能差、不可靠、结果不准确（相关度低）
+3.倒排索引、Lucene 和全文检索#1. 倒排索引的数据结构
+包含这个关键词的 document list
+关键词在每个doc中出现的次数 TF term frequency
+关键词在整个索引中出现的次数 IDF inverse doc frequency
+关键词在当前doc中出现的次数
+每个doc 的长度，越长相关度越低
+包含这个关键词的所有doc 的平均长度
+
+#2. Lucene:jar包，帮我们创建倒排索引，提供了复杂的API
+#3. 如果用 Lucene 做集群实现搜索，会有那些问题
+节点如果宕机，节点数据丢失，后果不堪设想，可用性差
+自己维护，麻烦（自己创建、管理索引），单台节点的承载请求的能力是有限的，需要人工来做负载（雨露均沾）
+
+#4. Elasticsearch
+分布式、高性能、高可用、可伸缩、易维护、ES≠搜索引擎
+
+
+分布式的搜索、存储和数据 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/7a6cb371/" title="一个简单的页面分页显隐算法">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/all_default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="一个简单的页面分页显隐算法"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/7a6cb371/" title="一个简单的页面分页显隐算法">一个简单的页面分页显隐算法</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-11-23T10:59:14.000Z" title="发表于 2020-11-23 18:59:14">2020-11-23</time></span></div><div class="content">前言一天，前端同学找我，说页面的分页组件算法应该怎么写，他已经写懵了，并且找了 Element 组件的源码查看分页组件，发现Element 分页组件移植过来有些问题，而且 Element 分页组件的算法很烂。然后我就写了一个分页算法出来
+实现过程原理原理很简单，就是通过计算开始渲染和结束渲染的盒子下标，然后除最小页码和最大页码外，此外的，均不进行渲染
+JavaScript 实现方式鄙人 Js 学的很烂，求轻喷。。。。😀
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768// 常量：总共页面显示的盒子数var SHOW_PAGE_NUM = 9;// 常量：当选中中间页码，前后渲染的盒子数量var CENTER_AROUND_NUM = 3;// 执行方法function main() &#123;    // 当前页码    let position = 1;    // 总页数   ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/34ad406f/" title="HBase 集群安装">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20200915180256.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="HBase 集群安装"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/34ad406f/" title="HBase 集群安装">HBase 集群安装</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-09-15T09:14:43.000Z" title="发表于 2020-09-15 17:14:43">2020-09-15</time></span></div><div class="content">Hbase 安装以三台机器搭建集群环境为例
+12345hbase1 10.10.3.129hbase2 10.10.3.130hbase3 10.10.3.131
+
+环境创建相关用户
+三台机器操作方式相同
+
+创建zookeeper、Hbase、Hadoop用户,并设置密码
+123456[root@localhost opt]# useradd zookeeper[root@localhost opt]# passwd zookeeper[root@localhost opt]# useradd hadoop[root@localhost opt]# passwd hadoop[root@localhost opt]# useradd hbase[root@localhost opt]# passwd hbase
+
+将此三个用户加入到 sudoers 中
+1[root@localhost ~]# vim /etc/sudoers
+
+
+
+Hosts 与 免密
+三台机器操作方式相同
+
+编辑hosts
+1[root@localhost opt]# vim /etc/hosts
+
+在文件末尾增加 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/6d9855d0/" title="Druid SQL解析工具的使用">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20200804141920.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Druid SQL解析工具的使用"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/6d9855d0/" title="Druid SQL解析工具的使用">Druid SQL解析工具的使用</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-08-03T02:57:58.000Z" title="发表于 2020-08-03 10:57:58">2020-08-03</time></span></div><div class="content">前言最近在项目运行过程中，需要对标准SQL进行解析，然后对SQL进行改写，在各种查找对比后选中了Alibaba Druid来进行解析SQL（如非特制，以下均简称 Druid）
+Druid官方的wiki说的还算明白，但可惜的是没有相关API文档。
+官方文档1. SQL Parser如需查看原文：SQL Parser
+1. 简介SQL Parser是Druid的一个重要组成部分，Druid内置使用SQL Parser来实现防御SQL注入（WallFilter）、合并统计没有参数化的SQL(StatFilter的mergeSql)、SQL格式化、分库分表。
+1.1. 和Antlr生成Parser的区别和Antlr生成的SQL有很大不同的是，Druid SQL Parser性能非常好，可以用于生产环境直接对SQL进行分析处理。
+1.2. Druid SQL Parser的使用场景
+MySql SQL全量统计
+Hive/ODPS SQL执行安全审计
+分库分表SQL解析引擎
+数据库引擎的SQL Parser
+
+2. 各种语法支持Druid的sql parser是目前支持各种数据语法最完备的SQL  ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/a097aeed/" title="Zookeeper 入门">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20200804150229.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Zookeeper 入门"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/a097aeed/" title="Zookeeper 入门">Zookeeper 入门</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-04-13T12:40:47.000Z" title="发表于 2020-04-13 20:40:47">2020-04-13</time></span></div><div class="content">前言在使用kafka，Hbase等大数据组件时，发现很多开源项目都用到了Zookeeper。所以在这里简单研究一下Zookeeper
+正文Zookeeper 是什么Zookeeper是一个分布式协调框架，实现同步服务，配置维护和命名服务等分布式应用。是一个高性能的分布式数据一致性解决方案
+Zookeeper 能干什么可以在分布式系统中共享配置，协调锁资源，提供命名服务
+
+分布式锁：利用Zookeeper的临时顺序节点，可以轻松实现分布式锁
+服务注册与发现： 利用Znode和Watcher，可以实现分布式服务的注册与发现。如：Dubbo
+共享配置与状态信息：如Redis的分布式Codis，利用Zookeeper存放数据路由表和codis-proxy节点的元信息，同时codis-config发起的命令都会通过Zookeeper同步到各个存活的codis-proxy。
+
+Zookeeper 的数据模型Zookeeper的数据模型类似于数据结构中的树，也类似于Linux文件系统中的目录
+树由多个节点构成，Zookeeper的数据存储同样基于节点。在 Zookeeper 中，这样的节点被称作为  ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/posts/8662ab0e/" title="Java 网络编程之 SSL加密连接">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Java 网络编程之 SSL加密连接"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/8662ab0e/" title="Java 网络编程之 SSL加密连接">Java 网络编程之 SSL加密连接</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-04-06T10:01:48.000Z" title="发表于 2020-04-06 18:01:48">2020-04-06</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Java-%E7%BC%96%E7%A8%8B%E7%9B%B8%E5%85%B3/">Java 编程相关</a></span></div><div class="content">前言关于SSL加密连接方式的一切在这里就不再赘述，这里主要分享关于在Java编程中如何对SSL进行编码
+正文几个重要的类KeyStore表示密钥和证书的存储设施
+主要用于存放证书，创建对象时，指定交换数字证书的加密标准
+用法如下(以pkcs12为例)：
+12345InputStream stream=new FileInputStream(new Filel(&quot;your file path&quot;));char[] password=&quot;your password&quot;.toCharArray();KeyStore keyStore=KeyStore.getInstance(&quot;PKCS12&quot;);keyStore.load(stream, password);stream.close();
+
+KeyManager选择证书来证明自己的身份
+这是用于 JSSE 密钥管理器的基接口。
+KeyManager 负责管理用于验证到同位体的本地 SSLSocket 的密钥内容。如果没有密钥内容可以使用，则套接字将不能提供验证证书。
+通过使用 KeyMan ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/posts/c88df007/" title="MongoDB 报文解读">     <img class="post_bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20200804150521.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MongoDB 报文解读"></a></div><div class="recent-post-info"><a class="article-title" href="/posts/c88df007/" title="MongoDB 报文解读">MongoDB 报文解读</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2020-04-02T03:30:19.000Z" title="发表于 2020-04-02 11:30:19">2020-04-02</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3/">数据库相关</a></span></div><div class="content">前言由于工作和学习的需要，需要对 MongoDB 的报文进行分析和解读，故通过 Wireshark 进行 MongoDB 的抓包进行分析和学习
+正文在抓包过程中，我们发现 MongoDB 在3.6之后引入了新的数据交换格式，与之前不同，但总体报文解析逻辑是相同的
+话不多说，先上MongoDB数据包的正确打开方式
+配置MongoDB协议解码器
+配置需要解码的端口号和协议
+
+过滤掉除MongoDB外的其他报文
+
+打开一个已经解码好的报文
+
+
+这样，我们就可以很直观的看到数据包中都传递了那些数据
+对于 MongoDB 的协议来说，OpCode是一个很重要的东西，根据OpCode，MongoDB区分了不同版本的报文结构。我们在Wireshark中看到的报文结构，都是经过完全解码后的数据。
+官方文档中也有对协议内容的一个大致说明：官方的协议说明
+在报文中有固定的一些字段，如下：
+
+
+
+Field
+Description
+
+
+
+messageLength
+The total size of the message in bytes. This total includes the 4 bytes  ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/4/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span></div></nav></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">LemonGo97</div><div class="author-info__description">分享一切与技术相关的文章，包括但不限于Java,Linux</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives"><div class="headline">文章</div><div class="length_num">47</div></a></div><div class="card-info-data-item is-center">      <a href="/tags"><div class="headline">标签</div><div class="length_num">33</div></a></div><div class="card-info-data-item is-center"><a href="/categories"><div class="headline">分类</div><div class="length_num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LemonGo97"><i class="fab fa-github"></i><span>Follow Me</span></a></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">分享技术，阅读</div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-recent-item"><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/372de39a/" title="【转载】 10 款更先进的开源命令行工具"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 10 款更先进的开源命令行工具"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/372de39a/" title="【转载】 10 款更先进的开源命令行工具">【转载】 10 款更先进的开源命令行工具</a><time class="aside-post_meta post-meta-date" datetime="2023-01-07T16:16:20.000Z" title="发表于 2023-01-08 00:16:20">2023-01-08</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/a263faa4/" title="【转载】 消息队列基本原理和选型对比"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 消息队列基本原理和选型对比"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/a263faa4/" title="【转载】 消息队列基本原理和选型对比">【转载】 消息队列基本原理和选型对比</a><time class="aside-post_meta post-meta-date" datetime="2023-01-07T16:04:50.000Z" title="发表于 2023-01-08 00:04:50">2023-01-08</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/a21e7a7c/" title="【转载】 一文搞懂 Redis 架构演化之路"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/all_default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 一文搞懂 Redis 架构演化之路"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/a21e7a7c/" title="【转载】 一文搞懂 Redis 架构演化之路">【转载】 一文搞懂 Redis 架构演化之路</a><time class="aside-post_meta post-meta-date" datetime="2023-01-07T16:01:48.000Z" title="发表于 2023-01-08 00:01:48">2023-01-08</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/8671c4ed/" title="【转载】 深入理解完美哈希"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 深入理解完美哈希"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/8671c4ed/" title="【转载】 深入理解完美哈希">【转载】 深入理解完美哈希</a><time class="aside-post_meta post-meta-date" datetime="2023-01-07T15:59:29.000Z" title="发表于 2023-01-07 23:59:29">2023-01-07</time></div></div><div class="aside-recent-post"><a class="aside-post-cover" href="/posts/ffad71e9/" title="【转载】 深入理解 Linux 的 TCP 三次握手"><img class="aside-post-bg" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/all_default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【转载】 深入理解 Linux 的 TCP 三次握手"/></a><div class="aside-post-info"><a class="aside-post-title" href="/posts/ffad71e9/" title="【转载】 深入理解 Linux 的 TCP 三次握手">【转载】 深入理解 Linux 的 TCP 三次握手</a><time class="aside-post_meta post-meta-date" datetime="2023-01-07T15:57:02.000Z" title="发表于 2023-01-07 23:57:02">2023-01-07</time></div></div></div></div></div><div class="card-widget card-categories"><div class="card-content"><div class="item-headline"><i class="fas fa-folder-open"></i><span>分类</span></div><ul class="card-category-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Java-%E7%BC%96%E7%A8%8B%E7%9B%B8%E5%85%B3/"><span class="card-category-list-name">Java 编程相关</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3/"><span class="card-category-list-name">数据库相关</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"><span class="card-category-list-name">源码分析</span><span class="card-category-list-count">3</span></a></li>
+                       
+            </ul></div></div><div class="card-widget card-tags"><div class="card-content"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/Curator/" style="font-size: 17px; color: #999c9f">Curator</a> <a href="/tags/Druid/" style="font-size: 16px; color: #999">Druid</a> <a href="/tags/ElasticSearch/" style="font-size: 21px; color: #99a6b9">ElasticSearch</a> <a href="/tags/Git/" style="font-size: 16px; color: #999">Git</a> <a href="/tags/HBase/" style="font-size: 16px; color: #999">HBase</a> <a href="/tags/Hadoop/" style="font-size: 16px; color: #999">Hadoop</a> <a href="/tags/Java/" style="font-size: 22px; color: #99a9bf">Java</a> <a href="/tags/JavaScript/" style="font-size: 16px; color: #999">JavaScript</a> <a href="/tags/Kubernetes/" style="font-size: 16px; color: #999">Kubernetes</a> <a href="/tags/Linux/" style="font-size: 19px; color: #99a1ac">Linux</a> <a href="/tags/MQ/" style="font-size: 16px; color: #999">MQ</a> <a href="/tags/MongoDB/" style="font-size: 17px; color: #999c9f">MongoDB</a> <a href="/tags/Nginx/" style="font-size: 16px; color: #999">Nginx</a> <a href="/tags/Redis/" style="font-size: 20px; color: #99a4b2">Redis</a> <a href="/tags/SQL/" style="font-size: 17px; color: #999c9f">SQL</a> <a href="/tags/SSL/" style="font-size: 16px; color: #999">SSL</a> <a href="/tags/Shell/" style="font-size: 16px; color: #999">Shell</a> <a href="/tags/TCP/" style="font-size: 16px; color: #999">TCP</a> <a href="/tags/Zookeeper/" style="font-size: 19px; color: #99a1ac">Zookeeper</a> <a href="/tags/firewalld/" style="font-size: 16px; color: #999">firewalld</a> <a href="/tags/git/" style="font-size: 16px; color: #999">git</a> <a href="/tags/java/" style="font-size: 16px; color: #999">java</a> <a href="/tags/kubernetes/" style="font-size: 16px; color: #999">kubernetes</a> <a href="/tags/svn/" style="font-size: 16px; color: #999">svn</a> <a href="/tags/tcp/" style="font-size: 16px; color: #999">tcp</a> <a href="/tags/zookeeper/" style="font-size: 16px; color: #999">zookeeper</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 17px; color: #999c9f">分布式</a> <a href="/tags/%E5%88%86%E9%A1%B5/" style="font-size: 16px; color: #999">分页</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 16px; color: #999">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 16px; color: #999">数据结构</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/" style="font-size: 16px; color: #999">注册中心</a> <a href="/tags/%E6%BA%90%E7%A0%81/" style="font-size: 18px; color: #999ea6">源码</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17px; color: #999c9f">算法</a></div></div></div><div class="card-widget card-archives"><div class="card-content"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/01/"><span class="card-archive-list-date">一月 2023</span><span class="card-archive-list-count">16</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/12/"><span class="card-archive-list-date">十二月 2022</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/05/"><span class="card-archive-list-date">五月 2022</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/04/"><span class="card-archive-list-date">四月 2022</span><span class="card-archive-list-count">8</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/02/"><span class="card-archive-list-date">二月 2021</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/01/"><span class="card-archive-list-date">一月 2021</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/12/"><span class="card-archive-list-date">十二月 2020</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/11/"><span class="card-archive-list-date">十一月 2020</span><span class="card-archive-list-count">6</span></a></li><li class="card-archive-list-item more is-center"><a class="card-archive-list-link-more" href="/archives">
+              <span>查看更多</span><i class="fas fa-angle-right"  ></i></a></li></ul></div></div><div class="card-widget card-webinfo"><div class="card-content"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="webinfo-article-name">文章数目 :</div><div class="webinfo-article-count">47</div></div></div></div></div></div></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"></div></div></body></html>
