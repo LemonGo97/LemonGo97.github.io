@@ -1,0 +1,403 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Linux I/O 那些事儿 | LemonGo97のBlog</title><meta name="description" content="介绍 Linux IO 的一些基本原理。  作者：arraywang，腾讯 CSIG 我们先看一张图：  这张图大体上描述了 Linux 系统上，应用程序对磁盘上的文件进行读写时，从上到下经历了哪些事情。 这篇文章就以这张图为基础，介绍 Linux 在 I&#x2F;O 上做了哪些事情。 文件系统什么是文件系统文件系统，本身是对存储设备上的文件，进行组织管理的机制。组织方式不同，就会形成不同的文件系统。比"><meta name="keywords" content="Linux"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/posts/66a2f2c2/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="article"><meta property="og:title" content="Linux I/O 那些事儿"><meta property="og:url" content="https://blog.lemongo97.com/posts/66a2f2c2/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="介绍 Linux IO 的一些基本原理。  作者：arraywang，腾讯 CSIG 我们先看一张图：  这张图大体上描述了 Linux 系统上，应用程序对磁盘上的文件进行读写时，从上到下经历了哪些事情。 这篇文章就以这张图为基础，介绍 Linux 在 I&#x2F;O 上做了哪些事情。 文件系统什么是文件系统文件系统，本身是对存储设备上的文件，进行组织管理的机制。组织方式不同，就会形成不同的文件系统。比"><meta property="og:image" content="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124192103.png"><meta property="article:published_time" content="2022-05-03T07:02:09.000Z"><meta property="article:modified_time" content="2022-05-03T07:02:09.000Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isSidebar: true,
+  postUpdate: '2022-05-03 15:02:09'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">40</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">31</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div id="sidebar"><i class="fas fa-arrow-right on" id="toggle-sidebar"></i><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.</span> <span class="toc-text">文件系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是文件系统</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C%EF%BC%88VFS%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">文件系统如何工作（VFS）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Linux-%E7%B3%BB%E7%BB%9F%E4%B8%8B%E7%9A%84%E6%96%87%E4%BB%B6"><span class="toc-number">1.2.1.</span> <span class="toc-text">Linux 系统下的文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#inode-%E5%92%8C-dentry"><span class="toc-number">1.2.2.</span> <span class="toc-text">inode 和 dentry</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E6%98%AF%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8%E5%9C%A8%E7%A3%81%E7%9B%98%E4%B8%8A%E7%9A%84"><span class="toc-number">1.2.3.</span> <span class="toc-text">文件是如何存储在磁盘上的</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ZFS"><span class="toc-number">2.</span> <span class="toc-text">ZFS</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ZFS-%E7%9A%84%E4%B8%80%E4%BA%9B%E6%93%8D%E4%BD%9C"><span class="toc-number">2.1.</span> <span class="toc-text">ZFS 的一些操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ZFS-%E7%89%B9%E6%80%A7"><span class="toc-number">2.2.</span> <span class="toc-text">ZFS 特性</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Pool-%E5%AD%98%E5%82%A8"><span class="toc-number">2.2.1.</span> <span class="toc-text">Pool 存储</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="toc-number">2.2.2.</span> <span class="toc-text">事务文件系统</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ARC-%E7%BC%93%E5%AD%98"><span class="toc-number">2.2.3.</span> <span class="toc-text">ARC 缓存</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ZFS-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">2.3.</span> <span class="toc-text">ZFS 参考资料</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">磁盘类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E5%AD%98%E5%82%A8%E4%BB%8B%E8%B4%A8"><span class="toc-number">3.1.</span> <span class="toc-text">磁盘的存储介质</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="toc-number">3.2.</span> <span class="toc-text">磁盘的接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Linux-%E5%AF%B9%E7%A3%81%E7%9B%98%E7%9A%84%E7%AE%A1%E7%90%86"><span class="toc-number">3.3.</span> <span class="toc-text">Linux 对磁盘的管理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generic-Block-Layer"><span class="toc-number">4.</span> <span class="toc-text">Generic Block Layer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#I-O-%E8%B0%83%E5%BA%A6"><span class="toc-number">4.1.</span> <span class="toc-text">I&#x2F;O 调度</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="toc-number">5.</span> <span class="toc-text">性能指标</span></a></li></ol></div></div></div><header class="post-bg" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124192103.png)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><div id="post-title"><div class="posttitle">【转载】 Linux I/O 那些事儿</div></div><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-05-03T07:02:09.000Z" title="发表于 2022-05-03 15:02:09">2022-05-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-05-03T07:02:09.000Z" title="更新于 2022-05-03 15:02:09">2022-05-03</time></span></div><div class="meta-secondline"> </div></div></div></header><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><blockquote>
+<p>介绍 Linux IO 的一些基本原理。</p>
+</blockquote>
+<p>作者：arraywang，腾讯 CSIG</p>
+<p>我们先看一张图：</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/9e429029ef7bc9947081facca8251abd.jpeg" alt=""></p>
+<p>这张图大体上描述了 Linux 系统上，应用程序对磁盘上的文件进行读写时，从上到下经历了哪些事情。</p>
+<p>这篇文章就以这张图为基础，介绍 Linux 在 I/O 上做了哪些事情。</p>
+<h3 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h3><h4 id="什么是文件系统"><a href="#什么是文件系统" class="headerlink" title="什么是文件系统"></a>什么是文件系统</h4><p>文件系统，本身是对存储设备上的文件，进行组织管理的机制。组织方式不同，就会形成不同的文件系统。比如常见的 Ext4、XFS、ZFS 以及网络文件系统 NFS 等等。</p>
+<p>但是不同类型的文件系统标准和接口可能各有差异，我们在做应用开发的时候却很少关心系统调用以下的具体实现，大部分时候都是直接系统调用 <code>open</code>, <code>read</code>, <code>write</code>, <code>close</code> 来实现应用程序的功能，不会再去关注我们具体用了什么文件系统（UFS、XFS、Ext4、ZFS），磁盘是什么接口（IDE、SCSI，SAS，SATA 等），磁盘是什么存储介质（HDD、SSD）</p>
+<p>应用开发者之所以这么爽，各种复杂细节都不用管直接调接口，是因为内核为我们做了大量的有技术含量的脏活累活。开始的那张图看到 Linux 在各种不同的文件系统之上，虚拟了一个 VFS，目的就是统一各种不同文件系统的标准和接口，让开发者可以使用相同的系统调用来使用不同的文件系统。</p>
+<h4 id="文件系统如何工作（VFS）"><a href="#文件系统如何工作（VFS）" class="headerlink" title="文件系统如何工作（VFS）"></a>文件系统如何工作（VFS）</h4><h5 id="Linux-系统下的文件"><a href="#Linux-系统下的文件" class="headerlink" title="Linux 系统下的文件"></a>Linux 系统下的文件</h5><p>在 Linux 中一切皆文件。不仅普通的文件和目录，就连块设备、套接字、管道等，也都要通过统一的文件系统来管理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">用 ls -l 命令看最前面的字符可以看到这个文件是什么类型  </span><br><span class="line">  </span><br><span class="line">brw-r--r-- 1 root    root    1, 2 4月  25 11:03 bnod // 块设备文件  </span><br><span class="line">crw-r--r-- 1 root    root    1, 2 4月  25 11:04 cnod // 符号设备文件  </span><br><span class="line">drwxr-xr-x 2 wrn3552 wrn3552    6 4月  25 11:01 dir // 目录  </span><br><span class="line">-rw-r--r-- 1 wrn3552 wrn3552    0 4月  25 11:01 file // 普通文件  </span><br><span class="line">prw-r--r-- 1 root    root       0 4月  25 11:04 pipeline // 有名管道  </span><br><span class="line">srwxr-xr-x 1 root    root       0 4月  25 11:06 socket.sock // socket文件  </span><br><span class="line">lrwxrwxrwx 1 root    root       4 4月  25 11:04 softlink -&gt; file // 软连接  </span><br><span class="line">-rw-r--r-- 2 wrn3552 wrn3552 0 4月  25 11:07 hardlink // 硬链接（本质也是普通文件）  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Linux 文件系统设计了两个数据结构来管理这些不同种类的文件：</p>
+<ul>
+<li><p>inode(index node)：索引节点</p>
+</li>
+<li><p>dentry(directory entry)：目录项</p>
+</li>
+</ul>
+<h5 id="inode-和-dentry"><a href="#inode-和-dentry" class="headerlink" title="inode 和 dentry"></a>inode 和 dentry</h5><p><strong>inode</strong></p>
+<p>inode 是用来记录文件的 metadata，所谓 metadata 在 Wikipedia 上的描述是 data of data，其实指的就是文件的各种属性，比如 inode 编号、文件大小、访问权限、修改日期、数据的位置等。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wrn3552@novadev:~/playground$ stat file  </span><br><span class="line">  文件：file  </span><br><span class="line">  大小：0               块：0          IO 块：4096   普通空文件  </span><br><span class="line">设备：fe21h/65057d      Inode：32828       硬链接：2  </span><br><span class="line">权限：(0644/-rw-r--r--)  Uid：( 3041/ wrn3552)   Gid：( 3041/ wrn3552)  </span><br><span class="line">最近访问：2021-04-25 11:07:59.603745534 +0800  </span><br><span class="line">最近更改：2021-04-25 11:07:59.603745534 +0800  </span><br><span class="line">最近改动：2021-04-25 11:08:04.739848692 +0800  </span><br><span class="line">创建时间：-  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>inode 和文件一一对应，它跟文件内容一样，都会被持久化存储到磁盘中。所以，inode 同样占用磁盘空间，只不过相对于文件来说它大小固定且大小不算大。</p>
+<p><strong>dentry</strong></p>
+<p>dentry 用来记录文件的名字、inode 指针以及与其他 dentry 的关联关系。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wrn3552@novadev:~/playground$ tree  </span><br><span class="line">.  </span><br><span class="line">├── dir  </span><br><span class="line">│   └── file_in_dir  </span><br><span class="line">├── file  </span><br><span class="line">└── hardlink  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>文件的名字：像 dir、file、hardlink、file_in_dir 这些名字是记录在 dentry 里的</p>
+</li>
+<li><p>inode 指针：就是指向这个文件的 inode</p>
+</li>
+<li><p>与其他 dentry 的关联关系：其实就是每个文件的层级关系，哪个文件在哪个文件下面，构成了文件系统的目录结构</p>
+</li>
+</ul>
+<p>不同于 inode，dentry 是由内核维护的一个内存数据结构，所以通常也被叫做 dentry cache。</p>
+<h5 id="文件是如何存储在磁盘上的"><a href="#文件是如何存储在磁盘上的" class="headerlink" title="文件是如何存储在磁盘上的"></a>文件是如何存储在磁盘上的</h5><p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/53fc1b4d063a7a003eef13bd205d05bd.jpeg" alt=""></p>
+<p>这里有张图解释了文件是如何存储在磁盘上的，首先，磁盘再进行文件系统格式化的时候，会分出来 3 个区：</p>
+<ol>
+<li><p>Superblock</p>
+</li>
+<li><p>inode blocks</p>
+</li>
+<li><p>data blocks</p>
+</li>
+</ol>
+<p>（其实还有 boot block，可能会包含一些 bootstrap 代码，在机器启动的时候被读到，这里忽略）其中 inode blocks 放的都是每个文件的 inode，data blocks 里放的是每个文件的内容数据。这里关注一下 superblock，它包含了整个文件系统的 metadata，具体有：</p>
+<ol>
+<li><p>inode/data block 总量、使用量、剩余量</p>
+</li>
+<li><p>文件系统的格式，属主等等各种属性</p>
+</li>
+</ol>
+<p>superblock 对于文件系统来说非常重要，如果 superblock 损坏了，文件系统就挂载不了了，相应的文件也没办法读写。既然 superblock 这么重要，那肯定不能只有一份，坏了就没了，它在系统中是有很多副本的，在 superblock 损坏的时候，可以使用 <code>fsck</code>（File System Check and repair）来恢复。回到上面的那张图，可以很清晰地看到文件的各种属性和文件的数据是如何存储在磁盘上的：</p>
+<ol>
+<li><p>dentry 里包含了文件的名字、目录结构、inode 指针</p>
+</li>
+<li><p>inode 指针指向文件特定的 inode（存在 inode blocks 里）</p>
+</li>
+<li><p>每个 inode 又指向 data blocks 里具体的 logical block，这里的 logical block 存的就是文件具体的数据</p>
+</li>
+</ol>
+<p>这里解释一下什么是 logical block：</p>
+<ol>
+<li><p>对于不同存储介质的磁盘，都有最小的读写单元</p>
+<ul>
+<li><code>/sys/block/sda/queue/physical_block_size</code></li>
+</ul>
+</li>
+</ol>
+<ol start="2">
+<li><p>HDD 叫做 sector（扇区），SSD 叫做 page（页面）</p>
+</li>
+<li><p>对于 hdd 来说，每个 sector 大小 512Bytes</p>
+</li>
+<li><p>对于 SSD 来说每个 page 大小不等（和 cell 类型有关），经典的大小是 4KB</p>
+</li>
+<li><p>但是 Linux 觉得按照存储介质的最小读写单元来进行读写可能会有效率问题，所以支持在文件系统格式化的时候指定 block size 的大小，一般是把几个 physical_block 拼起来就成了一个 logical block</p>
+<ul>
+<li><code>/sys/block/sda/queue/logical_block_size</code></li>
+</ul>
+</li>
+</ol>
+<ol start="6">
+<li>理论上应该是 logical_block_size &gt;= physical_block_size，但是有时候我们会看到 physical_block_size = 4K，logical_block_size = 512B 情况，其实这是因为磁盘上做了一层 512B 的仿真（emulation）（详情可参考 <a target="_blank" rel="noopener" href="https://g.126.fm/038DZzG">512e 和 4Kn</a>）</li>
+</ol>
+<h3 id="ZFS"><a href="#ZFS" class="headerlink" title="ZFS"></a>ZFS</h3><p>这里简单介绍一个广泛应用的文件系统 ZFS，一些数据库应用也会用到 ZFS，先看一张 zfs 的层级结构图：</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/8b9a8e85ee62f0e919d73409853ac43a.jpeg" alt=""></p>
+<p>这是一张从底向上的图：</p>
+<ol>
+<li><p>将若干物理设备 disk 组成一个虚拟设备 vdev（同时，disk 也是一种 vdev）</p>
+</li>
+<li><p>再将若干个虚拟设备 vdev 加到一个 zpool 里</p>
+</li>
+<li><p>在 zpool 的基础上创建 zfs 并挂载（zvol 可以先不看，我们没有用到）</p>
+</li>
+</ol>
+<h4 id="ZFS-的一些操作"><a href="#ZFS-的一些操作" class="headerlink" title="ZFS 的一些操作"></a>ZFS 的一些操作</h4><p><strong>创建 zpool</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">root@:~ # zpool create tank raidz /dev/ada1 /dev/ada2 /dev/ada3 raidz /dev/ada4 /dev/ada5 /dev/ada6  </span><br><span class="line">root@:~ # zpool list tank  </span><br><span class="line">NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT  </span><br><span class="line">tank     11G   824K  11.0G        -         -     0%     0%  1.00x  ONLINE  -  </span><br><span class="line">root@:~ # zpool status tank  </span><br><span class="line">  pool: tank  </span><br><span class="line"> state: ONLINE  </span><br><span class="line">  scan: none requested  </span><br><span class="line">config:  </span><br><span class="line">  </span><br><span class="line">        NAME        STATE     READ WRITE CKSUM  </span><br><span class="line">        tank        ONLINE       0     0     0  </span><br><span class="line">          raidz1-0  ONLINE       0     0     0  </span><br><span class="line">            ada1    ONLINE       0     0     0  </span><br><span class="line">            ada2    ONLINE       0     0     0  </span><br><span class="line">            ada3    ONLINE       0     0     0  </span><br><span class="line">          raidz1-1  ONLINE       0     0     0  </span><br><span class="line">            ada4    ONLINE       0     0     0  </span><br><span class="line">            ada5    ONLINE       0     0     0  </span><br><span class="line">            ada6    ONLINE       0     0     0  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>创建了一个名为 tank 的 zpool</p>
+</li>
+<li><p>这里的 raidz 同 RAID5</p>
+</li>
+</ul>
+<p>除了 raidz 还支持其他方案：</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/eed8390e91ebb7f2a74354fcb95644df.jpeg" alt=""></p>
+<p><strong>创建 zfs</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@:~ # zfs create -o mountpoint=/mnt/srev tank/srev  </span><br><span class="line">root@:~ # df -h tank/srev  </span><br><span class="line">Filesystem    Size    Used   Avail Capacity  Mounted on  </span><br><span class="line">tank/srev     7.1G    117K    7.1G     0%    /mnt/srev  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>创建了一个 zfs，挂载到了 /mnt/srev</p>
+</li>
+<li><p>这里没有指定 zfs 的 quota，创建的 zfs 大小即 zpool 大小</p>
+</li>
+</ul>
+<p><strong>对 zfs 设置 quota</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@:~ # zfs set quota=1G tank/srev  </span><br><span class="line">root@:~ # df -h tank/srev  </span><br><span class="line">Filesystem    Size    Used   Avail Capacity  Mounted on  </span><br><span class="line">tank/srev     1.0G    118K    1.0G     0%    /mnt/srev  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="ZFS-特性"><a href="#ZFS-特性" class="headerlink" title="ZFS 特性"></a>ZFS 特性</h4><h5 id="Pool-存储"><a href="#Pool-存储" class="headerlink" title="Pool 存储"></a>Pool 存储</h5><p>上面的层级图和操作步骤可以看到 zfs 是基于 zpool 创建的，zpool 可以动态扩容意味着存储空间也可以动态扩容，而且可以创建多个文件系统，文件系统共享完整的 zpool 空间无需预分配。</p>
+<h5 id="事务文件系统"><a href="#事务文件系统" class="headerlink" title="事务文件系统"></a>事务文件系统</h5><p>zfs 的写操作是事务的，意味着要么就没写，要么就写成功了，不会像其他文件系统那样，应用打开了文件，写入还没保存的时候断电，导致文件为空。zfs 保证写操作事务采用的是 copy on write 的方式：</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/286982242c985eface52c994c0bc65f0.jpeg" alt=""></p>
+<ul>
+<li><p>当 block B 有修改变成 B1 的时候，普通的文件系统会直接在 block B 原地进行修改变成 B1</p>
+</li>
+<li><p>zfs 则会再另一个地方写 B1，然后再在后面安全的时候对原来的 B 进行回收</p>
+</li>
+<li><p>这样结果就不会出现 B 被打开而写失败的情况，大不了就是 B1 没写成功</p>
+</li>
+</ul>
+<p>这个特性让 zfs 在断电后不需要执行 fsck 来检查磁盘中是否存在写操作失败需要恢复的情况，大大提升了应用的可用性。</p>
+<h5 id="ARC-缓存"><a href="#ARC-缓存" class="headerlink" title="ARC 缓存"></a>ARC 缓存</h5><p>ZFS 中的 ARC(Adjustable Replacement Cache) 读缓存淘汰算法，是基于 IBM 的 ARP(Adaptive Replacement Cache) 演化而来。在一些文件系统中实现的标准 LRU 算法其实是有缺陷的：比如复制大文件之类的线性大量 I/O 操作，导致缓存失效率猛增（大量文件只读一次，放到内存不会被再读，坐等淘汰）。</p>
+<p>另外，缓存可以根据时间来进行优化（LRU，最近最多使用），也可以根据频率进行优化（LFU，最近最常使用），这两种方法各有优劣，但是没办法适应所有场景。</p>
+<p>ARC 的设计就是尝试在 LRU 和 LFU 之间找到一个平衡，根据当前的 I/O workload 来调整用 LRU 多一点还是 LFU 多一点。</p>
+<p>ARC 定义了 4 个链表：</p>
+<ol>
+<li><p>LRU list：最近最多使用的页面，存具体数据</p>
+</li>
+<li><p>LFU list：最近最常使用的页面，存具体数据</p>
+</li>
+<li><p>Ghost list for LRU：最近从 LRU 表淘汰下来的页面信息，不存具体数据，只存页面信息</p>
+</li>
+<li><p>Ghost list for LFU：最近从 LFU 表淘汰下来的页面信息，不存具体数据，只存页面信息</p>
+</li>
+</ol>
+<p>ARC 工作流程大致如下：</p>
+<ol>
+<li><p>LRU list 和 LFU list 填充和淘汰过程和标准算法一样</p>
+</li>
+<li><p>当一个页面从 LRU list 淘汰下来时，这个页面的信息会放到 LRU ghost 表中</p>
+</li>
+<li><p>如果这个页面一直没被再次引用到，那么这个页面的信息最终也会在 LRU ghost 表中被淘汰掉</p>
+</li>
+<li><p>如果这个页面在 LRU ghost 表中未被淘汰的时候，被再一次访问了，这时候会引起一次幽灵（phantom）命中</p>
+</li>
+<li><p>phantom 命中的时候，事实上还是要把数据从磁盘第一次放缓存</p>
+</li>
+<li><p>但是这时候系统知道刚刚被 LRU 表淘汰的页面又被访问到了，说明 LRU list 太小了，这时它会把 LRU list 长度加一，LFU 长度减一</p>
+</li>
+<li><p>对于 LFU 的过程也与上述过程类似</p>
+</li>
+</ol>
+<h4 id="ZFS-参考资料"><a href="#ZFS-参考资料" class="headerlink" title="ZFS 参考资料"></a>ZFS 参考资料</h4><p>关于 ZFS 详细介绍可以参考：</p>
+<ul>
+<li>这篇<a target="_blank" rel="noopener" href="https://farseerfc.me/zhs/zfs-layered-architecture-design.html">文章</a></li>
+</ul>
+<h3 id="磁盘类型"><a href="#磁盘类型" class="headerlink" title="磁盘类型"></a>磁盘类型</h3><p>磁盘根据不同的分类方式，有各种不一样的类型。</p>
+<h4 id="磁盘的存储介质"><a href="#磁盘的存储介质" class="headerlink" title="磁盘的存储介质"></a>磁盘的存储介质</h4><p>根据磁盘的存储介质可以分两类（大家都很熟悉）：</p>
+<ul>
+<li><p>HDD（机械硬盘）</p>
+</li>
+<li><p>SSD（固态硬盘）</p>
+</li>
+</ul>
+<h4 id="磁盘的接口"><a href="#磁盘的接口" class="headerlink" title="磁盘的接口"></a>磁盘的接口</h4><p>根据磁盘接口分类：</p>
+<ul>
+<li><p>IDE (Integrated Drive Electronics)</p>
+</li>
+<li><p>SCSI (Small Computer System Interface)</p>
+</li>
+<li><p>SAS (Serial Attached SCSI)</p>
+</li>
+<li><p>SATA (Serial ATA)</p>
+</li>
+<li><p>…</p>
+</li>
+</ul>
+<p>不同的接口，往往分配不同的设备名称。比如， IDE 设备会分配一个 hd 前缀的设备名，SCSI 和 SATA 设备会分配一个 sd 前缀的设备名。如果是多块同类型的磁盘，就会按照 a、b、c 等的字母顺序来编号。</p>
+<h4 id="Linux-对磁盘的管理"><a href="#Linux-对磁盘的管理" class="headerlink" title="Linux 对磁盘的管理"></a>Linux 对磁盘的管理</h4><p>其实在 Linux 中，磁盘实际上是作为一个块设备来管理的，也就是以块为单位读写数据，并且支持随机读写。每个块设备都会被赋予两个设备号，分别是主、次设备号。主设备号用在驱动程序中，用来区分设备类型；而次设备号则是用来给多个同类设备编号。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">g18-&quot;299&quot; on ~# ls -l /dev/sda*  </span><br><span class="line">brw-rw---- 1 root disk 8,  0 Apr 25 15:53 /dev/sda  </span><br><span class="line">brw-rw---- 1 root disk 8,  1 Apr 25 15:53 /dev/sda1  </span><br><span class="line">brw-rw---- 1 root disk 8, 10 Apr 25 15:53 /dev/sda10  </span><br><span class="line">brw-rw---- 1 root disk 8,  2 Apr 25 15:53 /dev/sda2  </span><br><span class="line">brw-rw---- 1 root disk 8,  5 Apr 25 15:53 /dev/sda5  </span><br><span class="line">brw-rw---- 1 root disk 8,  6 Apr 25 15:53 /dev/sda6  </span><br><span class="line">brw-rw---- 1 root disk 8,  7 Apr 25 15:53 /dev/sda7  </span><br><span class="line">brw-rw---- 1 root disk 8,  8 Apr 25 15:53 /dev/sda8  </span><br><span class="line">brw-rw---- 1 root disk 8,  9 Apr 25 15:53 /dev/sda9  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>这些 sda 磁盘主设备号都是 8，表示它是一个 sd 类型的块设备</p>
+</li>
+<li><p>次设备号 0-10 表示这些不同 sd 块设备的编号</p>
+</li>
+</ul>
+<h3 id="Generic-Block-Layer"><a href="#Generic-Block-Layer" class="headerlink" title="Generic Block Layer"></a>Generic Block Layer</h3><p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/6c77fbca6e50059a358250fe26315ff4.jpeg" alt=""></p>
+<p>和 VFS 类似，为了对上层屏蔽不同块设备的差异，内核在文件系统和块设备之前抽象了一个 Generic Block Layer（通用块层），有时候一些人也会把下面的 I/O 调度层并到通用块层里表述。</p>
+<p>这两层主要做两件事：</p>
+<ol>
+<li><p>跟 VFS 的功能类似。向上，为文件系统和应用程序，提供访问块设备的标准接口；向下，把各种异构的磁盘设备抽象为统一的块设备，并提供统一框架来管理这些设备的驱动程序</p>
+</li>
+<li><p>对 I/O 请求进行调度，通过重新排序、合并等方式，提高磁盘读写效率</p>
+</li>
+</ol>
+<p>下图是一个完整的 I/O 栈全景图：</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/eea2869ae17a8825a5684126e1976dfa.jpeg" alt=""></p>
+<p>可以看到中间的 Block Layer 其实就是 Generic Block Layer，在图中可以看到 Block Layer 的 I/O 调度分为两类，分别表示单队列和多队列的调度：</p>
+<ul>
+<li><p>I/O scheduler</p>
+</li>
+<li><p>blkmq</p>
+</li>
+</ul>
+<h4 id="I-O-调度"><a href="#I-O-调度" class="headerlink" title="I/O 调度"></a>I/O 调度</h4><p>老版本的内核里只支持单队列的 I/O scheduler，在 3.16 版本的内核开始支持多队列 blkmq，这里介绍几种经典的 I/O 调度策略。</p>
+<p>单队列 I/O scheduler：</p>
+<ul>
+<li><p>NOOP：事实上是个 FIFO 的队列，只做基本的请求合并</p>
+</li>
+<li><p>CFQ：Completely Fair Queueing，完全公平调度器，给每个进程维护一个 I/O 调度队列，按照时间片来均匀分布每个进程 I/O 请求，</p>
+</li>
+<li><p>DeadLine：为读和写请求创建不同的 I/O 队列，确保达到 deadline 的请求被优先处理</p>
+</li>
+</ul>
+<p>多队列 blkmq：</p>
+<ul>
+<li><p>bfq：Budget Fair Queueing，也是公平调度器，不过不是按时间片来分配，而是按请求的扇区数量（带宽）</p>
+</li>
+<li><p>kyber：维护两个队列（同步/读、异步/写），同时严格限制发到这两个队列的请求数以保证相应时间</p>
+</li>
+<li><p>mq-deadline：多队列版本的 deadline</p>
+</li>
+</ul>
+<ul>
+<li><p>具体各种 I/O 调度策略可以参考 <a target="_blank" rel="noopener" href="https://wiki.ubuntu.com/Kernel/Reference/IOSchedulers">IOSchedulers</a></p>
+</li>
+<li><p>关于 blkmq 可以参考 <a target="_blank" rel="noopener" href="https://www.thomas-krenn.com/en/wiki/Linux_Multi-Queue_Block_IO_Queueing_Mechanism_(blk-mq)_Details">Linux Multi-Queue Block IO Queueing Mechanism (blk-mq) Details</a></p>
+</li>
+<li><p>多队列调度可以参考 <a target="_blank" rel="noopener" href="https://lwn.net/Articles/738449/">Block layer introduction part 2: the request layer</a></p>
+</li>
+</ul>
+<h3 id="性能指标"><a href="#性能指标" class="headerlink" title="性能指标"></a>性能指标</h3><p>一般来说 I/O 性能指标有这几个：</p>
+<ul>
+<li><p>使用率：ioutil，指的是磁盘处理 I/O 的时间百分比，ioutil 只看有没有 I/O 请求，不看 I/O 请求的大小。ioutil 越高表示一直都有 I/O 请求，不代表磁盘无法响应新的 I/O 请求</p>
+</li>
+<li><p>IOPS：每秒的 I/O 请求数</p>
+</li>
+<li><p>吞吐量/带宽：每秒的 I/O 请求大小，通常是 MB/s 或者 GB/s 为单位</p>
+</li>
+<li><p>响应时间：I/O 请求发出到收到响应的时间</p>
+</li>
+<li><p>饱和度：指的是磁盘处理 I/O 的繁忙程度。这个指标比较玄学，没有直接的数据可以表示，一般是根据平均队列请求长度或者响应时间跟基准测试的结果进行对比来估算</p>
+</li>
+</ul>
+<p>（在做基准测试时，还会分顺序/随机、读/写进行排列组合分别去测 IOPS 和带宽）</p>
+<p>上面的指标除了饱和度外，其他都可以在监控系统中看到。Linux 也提供了一些命令来输出不同维度的 I/O 状态：</p>
+<ul>
+<li><p><code>iostat -d -x</code>：看各个设备的 I/O 状态，数据来源 <code>/proc/diskstats</code></p>
+</li>
+<li><p><code>pidstat -d</code>：看近处的 I/O</p>
+</li>
+<li><p><code>iotop</code>：类似 top，按 I/O 大小对进程排序</p>
+</li>
+</ul>
+<p>本文转自 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/diKfeu1-Lr4ZA5Ky_66TZg">https://mp.weixin.qq.com/s/diKfeu1-Lr4ZA5Ky_66TZg</a>，如有侵权，请联系删除。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">arraywang</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/diKfeu1-Lr4ZA5Ky_66TZg">https://mp.weixin.qq.com/s/diKfeu1-Lr4ZA5Ky_66TZg</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog.lemongo97.com" target="_blank">LemonGo97のBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Linux/">Linux</a></div><div class="post_share"><div class="social-share" data-image="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124192103.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/6ba27ba/"><img class="prev-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">杂谈代码整洁</div></div></a></div><div class="next-post pull-right"><a href="/posts/a84c63b7/"><img class="next-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/3eb93c55a64067297eafa2aaa5b62a0f.jpeg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Linux Shell文本处理</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/posts/6cf05f2f/" title="Firewalld 防火墙示例，完整的入门指南"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/all_default.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-05</div><div class="relatedPosts_title">Firewalld 防火墙示例，完整的入门指南</div></div></a></div><div class="relatedPosts_item"><a href="/posts/a84c63b7/" title="Linux Shell文本处理"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/3eb93c55a64067297eafa2aaa5b62a0f.jpeg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-03</div><div class="relatedPosts_title">Linux Shell文本处理</div></div></a></div><div class="relatedPosts_item"><a href="/posts/a10ff556/" title="Linux中检查本地系统上的开放端口列表的方法"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201124192103.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2020-11-24</div><div class="relatedPosts_title">Linux中检查本地系统上的开放端口列表的方法</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font_plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font_minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    window.valine = new Valine({
+      el: '#vcomment',
+      appId: 'w7vT5VedMPyGHyDYppcacmtw-gzGzoHsz',
+      appKey: 'YxBl09Aj50g5Ld621aydI4pz',
+      placeholder: '来和大家一起讨论吧！',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    });
+    if ('nick,mail') { valine.config.requiredFields= 'nick,mail'.split(',') }
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else $.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js', initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div></div></body></html>
