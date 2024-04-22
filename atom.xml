@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.lemongo97.com/"/>
-  <updated>2023-01-07T16:16:20.000Z</updated>
+  <updated>2024-04-22T07:58:16.000Z</updated>
   <id>https://blog.lemongo97.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>更优雅的使用Gson解析Json</title>
+    <link href="https://blog.lemongo97.com/posts/33bcc5a1/"/>
+    <id>https://blog.lemongo97.com/posts/33bcc5a1/</id>
+    <published>2024-04-22T07:58:16.000Z</published>
+    <updated>2024-04-22T07:58:16.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="JSON" scheme="https://blog.lemongo97.com/tags/JSON/"/>
+    
+  </entry>
   
   <entry>
     <title>10 款更先进的开源命令行工具</title>
@@ -478,29 +505,6 @@
     
     
       <category term="ElasticSearch" scheme="https://blog.lemongo97.com/tags/ElasticSearch/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>杂谈代码整洁</title>
-    <link href="https://blog.lemongo97.com/posts/6ba27ba/"/>
-    <id>https://blog.lemongo97.com/posts/6ba27ba/</id>
-    <published>2022-05-03T07:07:57.000Z</published>
-    <updated>2022-05-03T07:07:57.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
     
   </entry>
   
