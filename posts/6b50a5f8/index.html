@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Golang 整洁架构实践 | LemonGo97のBlog</title><meta name="description" content="作者：donghli，腾讯 PCG 后台开发工程师  了解过 Hex 六边形架构、Onion 洋葱架构、Clean 整洁架构的同学可以将本篇文章介绍的实践方法与自身项目代码架构对比并互通有无，共同改进。没了解过上述架构的同学可以学习一种新的架构方法，并尝试将其应用到业务项目中，降低项目维护成本，提高效率。  本文提及的架构主要指项目组织的“代码架构”，注意与微服务架构等名词中的服务架构进行区分。"><meta name="keywords" content="Golang"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/posts/6b50a5f8/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="article"><meta property="og:title" content="Golang 整洁架构实践"><meta property="og:url" content="https://blog.lemongo97.com/posts/6b50a5f8/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="作者：donghli，腾讯 PCG 后台开发工程师  了解过 Hex 六边形架构、Onion 洋葱架构、Clean 整洁架构的同学可以将本篇文章介绍的实践方法与自身项目代码架构对比并互通有无，共同改进。没了解过上述架构的同学可以学习一种新的架构方法，并尝试将其应用到业务项目中，降低项目维护成本，提高效率。  本文提及的架构主要指项目组织的“代码架构”，注意与微服务架构等名词中的服务架构进行区分。"><meta property="og:image" content="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg"><meta property="article:published_time" content="2024-04-24T06:15:23.000Z"><meta property="article:modified_time" content="2024-04-24T06:15:23.000Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isSidebar: true,
+  postUpdate: '2024-04-24 14:15:23'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">53</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">35</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div id="sidebar"><i class="fas fa-arrow-right on" id="toggle-sidebar"></i><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9C%89%E4%BB%A3%E7%A0%81%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">1.为什么要有代码架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81%E6%9E%B6%E6%9E%84%E6%98%AF%E5%A6%82%E4%BD%95%E6%9E%84%E5%BB%BA%E7%9A%84"><span class="toc-number">2.</span> <span class="toc-text">2.好的代码架构是如何构建的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%8E%A8%E8%8D%90%E4%B8%80%E7%A7%8D-Go-%E4%BB%A3%E7%A0%81%E6%9E%B6%E6%9E%84%E5%AE%9E%E8%B7%B5"><span class="toc-number">3.</span> <span class="toc-text">3.推荐一种 Go 代码架构实践</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">4.总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-number">5.</span> <span class="toc-text">5. 参考文献</span></a></li></ol></div></div></div><header class="post-bg" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><div id="post-title"><div class="posttitle">【转载】 Golang 整洁架构实践</div></div><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-04-24T06:15:23.000Z" title="发表于 2024-04-24 14:15:23">2024-04-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-24T06:15:23.000Z" title="更新于 2024-04-24 14:15:23">2024-04-24</time></span></div><div class="meta-secondline"> </div></div></div></header><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><p>作者：donghli，腾讯 PCG 后台开发工程师</p>
+<blockquote>
+<p>了解过 Hex 六边形架构、Onion 洋葱架构、Clean 整洁架构的同学可以将本篇文章介绍的实践方法与自身项目代码架构对比并互通有无，共同改进。没了解过上述架构的同学可以学习一种新的架构方法，并尝试将其应用到业务项目中，降低项目维护成本，提高效率。</p>
+</blockquote>
+<p>本文提及的架构主要指项目组织的“代码架构”，注意与微服务架构等名词中的服务架构进行区分。</p>
+<h3 id="1-为什么要有代码架构"><a href="#1-为什么要有代码架构" class="headerlink" title="1.为什么要有代码架构"></a>1.为什么要有代码架构</h3><p>历史悠久的项目大都会有很多开发人员参与“贡献”，在没有好的指导规则约束的情况下，大抵会变成一团乱麻。剪不断，理还乱，也没有勇士开发者愿意去剪去理。被迫接手的勇士开发者如果想要增加一个小需求，可能需要花 10 倍的时间去理顺业务逻辑，再花 10 倍的时间去补充测试代码，实在是低效又痛苦。</p>
+<p>这是一个普遍的痛点问题，也有无数开发者尝试过去解决它。这么多年发展累积下来，业界自然也诞生了很多软件架构。大家耳熟能详的就有六边形架构（Hexagonal Architecture），洋葱架构（Onion Architecture），整洁架构（Clean Architecture）等。这些架构在细节上肯定有所差异，但是核心目标都是一致的：致力于实现软件系统的<strong>关注点分离</strong>（separation of concerns）。</p>
+<p>关注点分离之后的软件系统都具备如下特征：</p>
+<p>* <strong>不依赖特定 UI</strong>。UI 可以任意替换，不会影响系统重其他组件。从 Web UI 变成桌面 UI，甚至变成控制台 UI 都无所谓，业务逻辑不会被影响。</p>
+<p>* <strong>不依赖特定框架</strong>。以 JavaScript 生态举例，不管是使用 web 框架 koa, express，还是使用桌面应用框架 electron，还是控制台框架 commander，业务逻辑都不会被影响，被影响的只会是框架接入的那一层。</p>
+<p>* <strong>不依赖特定外部组件</strong>。系统可以任意使用 MySQL, MongoDB, 或 Neo4j 作为数据库，任意使用 Redis, Memcached, 或 etcd 作为键值存储等。业务逻辑不会因为这些外部组件的替换而变化。</p>
+<p>* <strong>容易测试</strong>。核心业务逻辑可以在不需要 UI，不需要数据库，不需要 Web 服务器等一切外界组件的情况下被测试。这种纯粹的代码逻辑意味着清晰容易的测试。</p>
+<p>软件系统有了这些特征后，易于测试，更易于维护、更新，大大减轻了软件开发人员的心智负担。所以，好的代码架构确实值得推崇。</p>
+<h3 id="2-好的代码架构是如何构建的"><a href="#2-好的代码架构是如何构建的" class="headerlink" title="2.好的代码架构是如何构建的"></a>2.好的代码架构是如何构建的</h3><p>前文所述的三个架构在理念上是近似的，从下文图 1 到图 3 三幅架构图中也能看出相似的圈层结构。图中可以看到，越往外层越具体，越往内层越抽象。这也意味着，越往外越有可能发生变化，包括但不限于框架升级，中间件变更，适配新终端等等。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/d72f0068aefe9ffe3cbcbe0284bf9451.jpeg" alt=""></p>
+<p>图 1 The Clean Architecture, Robert C. Martin</p>
+<p>图 1 整洁架构的同心圆结构中可以看见三条由外向内的黑色箭头，它表示<strong>依赖规则</strong>（<strong>The Dependency Rule</strong>）。依赖规则规定外层的代码可以依赖内层，但是内层的代码不可以依赖外层。也就是说内层逻辑不可以依赖任何外层定义的变量，函数，结构体，类，模块等等代码实体。假如说，最外层蓝色层“Frameworks &amp; Drivers” DB 处使用了 go 语言的 gorm 三方库，并定义了 gorm 相关的数据库结构体及其 tag 等。那么内层的 Gateways，Use Cases， Entities 等处不可以引用任何外层中 gorm 相关的结构体或方法，甚至不应该感知到 gorm 的存在。</p>
+<p>核心层的 Entities 定义表示核心业务规则的核心业务实体。这些实体既可以是带方法的类，也可以是带有一堆函数的结构体。但它们必须是高度抽象的，只可以随着核心业务规则变化，不可以随着外层组件的变化而变化。以简单博客系统举例的话，此层可以定义 Blog，Comment 等核心业务实体。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Blog <span class="keyword">struct</span> &#123;...&#125;  </span><br><span class="line"><span class="keyword">type</span> Comment <span class="keyword">struct</span> &#123;...&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>核心层的外层是应用业务层。</p>
+<p>应用业务层的 Use Cases 应该包含软件系统所有的业务逻辑。该层控制所有流向和流出核心层的数据流，并使用核心层的实体及其业务规则来完成业务需求。此层的变更不会影响核心层，更外层的变更，比如开发框架、数据库、UI 等变化，也不会影响此层。接着博客系统的例子，此层可以定义 BlogManager 接口，并定义其中的 CreateBlog, LeaveComment 等业务逻辑方法。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> BlogManager <span class="keyword">interface</span> &#123;  </span><br><span class="line">    CreateBlog(...) ...  </span><br><span class="line">    LeaveComment(...) ...  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>应用业务层的外层是接口适配层。</p>
+<p>接口适配层的 Controllers 将外层输入的数据转换成内层 Use Cases 和 Entities 方便使用的格式，然后 Presenters，Gateways 再将内层处理结果转换成外层方便使用的格式，然后再由更外层呈现到 Web， UI 或者写入到数据库。假如系统选择关系型数据库作为其持久化方案的话，那么所有关于 SQL 的处理都应该在此层完成，更内层不需要感知到任何数据库的存在。同理，假如系统与外界服务通信的话，那么所有有关外界服务数据的转化都在此层完成，更内层也不需要感知到外界服务的存在。外层通过此层传递数据一般通过 DTO（Data Transfer Object）或者 DO（Data Object）完成。接上文博客系统例子，示例代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> BlogDTO <span class="keyword">struct</span> &#123; <span class="comment">// Data Transfer Object  </span></span><br><span class="line">    Content <span class="type">string</span> <span class="string">`json:&quot;...&quot;`</span>  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// DTO 与 model.Blog 的转化在此层完成  </span></span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CreateBlog</span><span class="params">(b *model.Blog)</span></span> &#123;  </span><br><span class="line"> dbClient.Create(&amp;blog&#123;...&#125;)  </span><br><span class="line"> ...  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>接口适配层的外层是处在最外层的框架和驱动层。</p>
+<p>该层包含具体的框架和依赖工具细节，比如系统使用的数据库，Web 框架，消息队列等等。此层主要帮助外部框架、工具和内层进行数据衔接。接博客系统例子，框架和驱动层如果使用 gorm 来操作数据库，则相关的示例代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;gorm.io/driver/mysql&quot;</span>  </span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;gorm.io/gorm&quot;</span>  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">type</span> blog <span class="keyword">struct</span> &#123; <span class="comment">// Data Object  </span></span><br><span class="line">    Content <span class="type">string</span> <span class="string">`gorm:&quot;...&quot;`</span> <span class="comment">// 本层的数据库 ORM 如果替换，此处的 tag 也需要随之改变  </span></span><br><span class="line">&#125;  </span><br><span class="line"><span class="keyword">type</span> MySQLClient <span class="keyword">struct</span> &#123; DB *gorm.DB &#125;  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">New</span><span class="params">(...)</span></span> &#123; gorm.Open(...) ... &#125;  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Create</span><span class="params">(...)</span></span>  </span><br><span class="line">...  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>至此，整洁架构图中的四层已介绍完成。但此图中的四层结构仅作示意，整洁架构并不要求软件系统必须严格按照此四层结构。只要软件系统能保证“由外向内”的依赖规则，系统的层数多少可自由裁决。</p>
+<p>同整洁架构齐名的洋葱架构，与其相似，整体结构也是四层同心圆。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/4de908a73ab16b1a9fa17f4818bf81e6.png" alt=""></p>
+<p>图 2 Onion Architecture, Jeffrey Palermo</p>
+<p>图 2 中洋葱架构最核心的 Domain Model 表示组织中核心业务的状态及其行为模型，与整洁架构中的 Entities 高度一致。其外层的 Domain Services 与整洁架构中的 Use Cases 职责相近。更外层的 Application Services 桥接 UI 和 Infrastructue 中的数据库、文件、外部服务等，更是与整洁架构中的 Interface Adaptors 功能相同。最边缘层的 User Interface 与整洁架构中的最外层 UI 部分一致，Infrastructure 则与整洁架构中的 DB， Devices， External Interfaces 作用一致，只 Tests 部分稍有差异。</p>
+<p>同前两者齐名的六边形架构，虽然外形不是同心圆，但是结构上还是有很多呼应的地方。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/9a41d8a1971bffeb4a21172d18f75570.png" alt=""></p>
+<p>图 3 Hexagon Architecture, Andrew Gordon</p>
+<p>图 3 六边形架构中灰色箭头表示<strong>依赖注入</strong>（<strong>Dependency Injection</strong>），其与整洁架构中的<strong>依赖规则</strong>（<strong>The Dependency Rule</strong>）有异曲同工之妙，也限制了整个架构各组件的依赖方向必须是“由外向内”。图中的各种 Port 和 Adapter 是六边形架构的重中之重，故该架构别称 Ports and Adapters。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/d0e91269148195230705fd5bf59a7fe8.png" alt=""></p>
+<p>图 4 Hexagon Architecture Phase 1, Pablo Martinez</p>
+<p>如图 4 所示，在六边形架构中，来自<strong>驱动边</strong>（<strong>Driving Side</strong>）的用户或外部系统输入通过左边的 Port &amp; Adapter 到达应用系统，处理后，再通过右边的 Adapter &amp; Port 输出到<strong>被驱动边</strong>（<strong>Driven Side</strong>）的数据库和文件等。</p>
+<p>Port 是系统的一种与具体实现无关的入口，该入口定义了外界与系统通信的接口（interface）。Port 不关心接口的具体实现，就好比 USB 端口允许多种设备通过其与电脑通信，但它不关心设备与电脑之间的照片，视频等等具体数据是如何编解码传输的。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/2a09befe8bead7d5e99c38814972f380.png" alt=""></p>
+<p>图 5 Hexagon Architecture Phase 2, Pablo Martinez</p>
+<p>如图 5 所示，Adapter 负责 Port 定义的接口的技术实现，并通过 Port 发起与应用系统的交互。比如，图左 Driving Side 的 Adapter 可以是一个 REST 控制器，客户端通过它与应用系统通信。图右 Driven Side 的 Adapter 可以是一个数据库驱动，应用系统的数据通过它写入数据库。此图中可以看到，虽然六边形架构看上去与整洁架构不那么相似，但其应用系统核心层的 Domain ，边缘层的 User Interface 和 Infrastructure 与整洁架构中的 Entities 和 Frameworks &amp; Drivers 完全是遥相呼应。</p>
+<p>再次回到图 3 的六边形架构整体图，以 Java 生态为例，Driving Side 的 HTTP Server In Port 可以承接来自 Jetty 或 Servlet 等 Adapter 的请求，其中 Jetty 的请求可以是来自其他服务的调用。既处在 Driving Side，又处在 Driven Sides 的 Messaging In/Out Port 可以承接来自 RabbitMQ 的事件请求，也可以将 Application Adapters 中生成的数据写入到 RabbitMQ。Driven Side 的 Store Out Port 可以将 Application Adapters 产生的数据写入到 MongoDB；HTTP Client Out Port 则可以将 Application Adapters 产生的数据通过 JettyHTTP 发送到外部服务。</p>
+<p>其实，不仅国外有优秀的代码架构，国内也有。</p>
+<p>国内开发者在学习了六边形架构，洋葱架构和整洁架构之后，提出了 COLA （Clean Object-oriented and Layered Architecture）架构，其名称含义为“整洁的基于面向对象和分层的架构”。它的核心理念与国外三种架构相同，都是<strong>提倡以业务为核心，解耦外部依赖，分离业务复杂度和技术复杂度</strong>[4]。整体架构形式如图 6 所示。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/e5b7b957adf38d2b82a8aff48520c399.jpeg" alt=""></p>
+<p>图 6 COLA 架构, 张建飞</p>
+<p>虽然 COLA 架构不再是同心圆或者六边形的形式，但是还是能明显看到前文三种架构的影子。Domain 层中 model 对应整洁架构的 Entities，六边形架构和洋葱架构中的 Domain Model。Domain 层中 gateway 和 ability 对应整洁架构的 Use Cases，六边形架构中的 Application Logic，以及洋葱架构中的 Domain Services。App 层则对应整洁架构 Interface Adapters 层中的 Controllers，Gateways，和 Presenters。最上方的 Adapter 层和最下方的 Infrastructure 层合起来与整洁架构的边缘层 Frameworks &amp; Drivers 相呼应。</p>
+<p>Adapter 层上方的 Driving adater 与 Infrastructure 层下方的 Driven adapter 更是与六边形架构中的 Driving Side 和 Driven Side 高度一致。</p>
+<p>COLA 架构在 Java 生态中落地已久，也为开发者们提供了 Java 语言的 archetype，可方便地用于 Java 项目脚手架代码的生成。笔者受其启发，推出了一种符合 COLA 架构规则的 Go 语言项目脚手架实践方案。</p>
+<h3 id="3-推荐一种-Go-代码架构实践"><a href="#3-推荐一种-Go-代码架构实践" class="headerlink" title="3.推荐一种 Go 代码架构实践"></a>3.推荐一种 Go 代码架构实践</h3><p>项目目录结构如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">├── adapter <span class="comment">// Adapter层，适配各种框架及协议的接入，比如：Gin，tRPC，Echo，Fiber 等  </span></span><br><span class="line">├── application <span class="comment">// App层，处理Adapter层适配过后与框架、协议等无关的业务逻辑  </span></span><br><span class="line">│   ├── consumer <span class="comment">//（可选）处理外部消息，比如来自消息队列的事件消费  </span></span><br><span class="line">│   ├── dto <span class="comment">// App层的数据传输对象，外层到达App层的数据，从App层出发到外层的数据都通过DTO传播  </span></span><br><span class="line">│   ├── executor <span class="comment">// 处理请求，包括command和query  </span></span><br><span class="line">│   └── scheduler <span class="comment">//（可选）处理定时任务，比如Cron格式的定时Job  </span></span><br><span class="line">├── domain <span class="comment">// Domain层，最核心最纯粹的业务实体及其规则的抽象定义  </span></span><br><span class="line">│   ├── gateway <span class="comment">// 领域网关，model的核心逻辑以Interface形式在此定义，交由Infra层去实现  </span></span><br><span class="line">│   └── model <span class="comment">// 领域模型实体  </span></span><br><span class="line">├── infrastructure <span class="comment">// Infra层，各种外部依赖，组件的衔接，以及domain/gateway的具体实现  </span></span><br><span class="line">│   ├── cache <span class="comment">//（可选）内层所需缓存的实现，可以是Redis，Memcached等  </span></span><br><span class="line">│   ├── client <span class="comment">//（可选）各种中间件client的初始化  </span></span><br><span class="line">│   ├── config <span class="comment">// 配置实现  </span></span><br><span class="line">│   ├── database <span class="comment">//（可选）内层所需持久化的实现，可以是MySQL，MongoDB，Neo4j等  </span></span><br><span class="line">│   ├── distlock <span class="comment">//（可选）内层所需分布式锁的实现，可以基于Redis，ZooKeeper，etcd等  </span></span><br><span class="line">│   ├── log <span class="comment">// 日志实现，在此接入第三方日志库，避免对内层的污染  </span></span><br><span class="line">│   ├── mq <span class="comment">//（可选）内层所需消息队列的实现，可以是Kafka，RabbitMQ，Pulsar等  </span></span><br><span class="line">│   ├── node <span class="comment">//（可选）服务节点一致性协调控制实现，可以基于ZooKeeper，etcd等  </span></span><br><span class="line">│   └── rpc <span class="comment">//（可选）广义上第三方服务的访问实现，可以通过HTTP，gRPC，tRPC等  </span></span><br><span class="line">└── pkg <span class="comment">// 各层可共享的公共组件代码  </span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>由此目录结构可以看出通过 Adapter 层屏蔽外界框架、协议的差异，Infrastructure 层囊括各种中间件和外部依赖的具体实现，App 层负责组织输入输出， Domain 层可以完全聚焦在最纯粹也最不容易变化的核心业务规则上。</p>
+<p>按照前文 infrastructure 中目录结构，各子目录中文件样例参考如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">├── infrastructure  </span><br><span class="line">│   ├── cache  </span><br><span class="line">│   │   └── redis.<span class="keyword">go</span> <span class="comment">// Redis 实现的缓存  </span></span><br><span class="line">│   ├── client  </span><br><span class="line">│   │   ├── kafka.<span class="keyword">go</span> <span class="comment">// 构建 Kafka client  </span></span><br><span class="line">│   │   ├── mysql.<span class="keyword">go</span> <span class="comment">// 构建 MySQL client  </span></span><br><span class="line">│   │   ├── redis.<span class="keyword">go</span> <span class="comment">// 构建 Redis client（cache和distlock中都会用到 Redis，统一在此构建）  </span></span><br><span class="line">│   │   └── zookeeper.<span class="keyword">go</span> <span class="comment">// 构建 ZooKeeper client  </span></span><br><span class="line">│   ├── config  </span><br><span class="line">│   │   └── config.<span class="keyword">go</span> <span class="comment">// 配置定义及其解析  </span></span><br><span class="line">│   ├── database  </span><br><span class="line">│   │   ├── dataobject.<span class="keyword">go</span> <span class="comment">// 数据库操作依赖的数据对象  </span></span><br><span class="line">│   │   └── mysql.<span class="keyword">go</span> <span class="comment">// MySQL 实现的数据持久化  </span></span><br><span class="line">│   ├── distlock  </span><br><span class="line">│   │   ├── distributed_lock.<span class="keyword">go</span> <span class="comment">// 分布式锁接口，在此是因为domain/gateway中没有直接需要此接口  </span></span><br><span class="line">│   │   └── redis.<span class="keyword">go</span> <span class="comment">// Redis 实现的分布式锁  </span></span><br><span class="line">│   ├── log  </span><br><span class="line">│   │   └── log.<span class="keyword">go</span> <span class="comment">// 日志封装  </span></span><br><span class="line">│   ├── mq  </span><br><span class="line">│   │   ├── dataobject.<span class="keyword">go</span> <span class="comment">// 消息队列操作依赖的数据对象  </span></span><br><span class="line">│   │   └── kafka.<span class="keyword">go</span> <span class="comment">// Kafka 实现的消息队列  </span></span><br><span class="line">│   ├── node  </span><br><span class="line">│   │   └── zookeeper_client.<span class="keyword">go</span> <span class="comment">// ZooKeeper 实现的一致性协调节点客户端  </span></span><br><span class="line">│   └── rpc  </span><br><span class="line">│       ├── dataapi.<span class="keyword">go</span> <span class="comment">// 第三方服务访问功能封装  </span></span><br><span class="line">│       └── dataobject.<span class="keyword">go</span> <span class="comment">// 第三方服务访问操作依赖的数据对象  </span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>再接前文提到的博客系统例子，假设用 Gin 框架搭建博客系统 API 服务的话，架构各层相关目录内容大致如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Adapter 层 router.go，路由入口  </span></span><br><span class="line"><span class="keyword">import</span> (  </span><br><span class="line">    <span class="string">&quot;mybusiness.com/blog-api/application/executor&quot;</span> <span class="comment">// 向内依赖 App 层  </span></span><br><span class="line">  </span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span>  </span><br><span class="line">)  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewRouter</span><span class="params">(...)</span></span> (*gin.Engine, <span class="type">error</span>) &#123;  </span><br><span class="line">  r := gin.Default()  </span><br><span class="line">  r.GET(<span class="string">&quot;/blog/:blog_id&quot;</span>, getBlog)  </span><br><span class="line">  ...  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getBlog</span><span class="params">(...)</span></span> ... &#123;  </span><br><span class="line">  <span class="comment">// b&#x27;s type: *executor.BlogOperator  </span></span><br><span class="line">  result := b.GetBlog(blogID)  </span><br><span class="line">  <span class="comment">// c&#x27;s type: *gin.Context  </span></span><br><span class="line">  c.JSON(..., result)  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如代码所体现，Gin 框架的内容全部会被限制在 Adapter 层，其他层不会感知到该框架的存在。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// App 层 executor/blog_operator.go  </span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;mybusiness.com/blog-api/domain/gateway&quot;</span> <span class="comment">// 向内依赖 Domain 层  </span></span><br><span class="line">  </span><br><span class="line"><span class="keyword">type</span> BlogOperator <span class="keyword">struct</span> &#123;  </span><br><span class="line">  blogManager gateway.BlogManager <span class="comment">// 字段 type 是接口类型，通过 Infra 层具体实现进行依赖注入  </span></span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *BlogOperator)</span></span> GetBlog(...) ... &#123;  </span><br><span class="line">    blog, err := b.blogManager.Load(ctx, blogID)  </span><br><span class="line">    ...  </span><br><span class="line">    <span class="keyword">return</span> dto.BlogFromModel(...) <span class="comment">// 通过 DTO 传递数据到外层  </span></span><br><span class="line">&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>App 层会依赖 Domain 层定义的领域网关，而领域网关接口会由 Infra 层的具体实现注入。外层调用 App 层方法，通过 DTO 传递数据，App 层组织好输入交给 Domain 层处理，再将得到的结果通过 DTO 传递到外层。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Domain 层 gateway/blog_manager.go  </span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;mybusiness.com/blog-api/domain/model&quot;</span> <span class="comment">// 依赖同层的 model  </span></span><br><span class="line">  </span><br><span class="line"><span class="keyword">type</span> BlogManager <span class="keyword">interface</span> &#123; <span class="comment">//定义核心业务逻辑的接口方法  </span></span><br><span class="line">  Load(...) ...  </span><br><span class="line">  Save(...) ...  </span><br><span class="line">  ...  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Domain 层是核心层，不会依赖任何外层组件，只能层内依赖。这也保障了 Domain 层的纯粹，保障了整个软件系统的可维护性。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Infrastructure 层 database/mysql.go  </span></span><br><span class="line"><span class="keyword">import</span> (  </span><br><span class="line">    <span class="string">&quot;mybusiness.com/blog-api/domain/model&quot;</span> <span class="comment">// 依赖内层的 model  </span></span><br><span class="line">    <span class="string">&quot;mybusiness.com/blog-api/infrastructure/client&quot;</span> <span class="comment">// 依赖同层的 client  </span></span><br><span class="line">)  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">type</span> MySQLPersistence <span class="keyword">struct</span> &#123;  </span><br><span class="line">  client client.SQLClient <span class="comment">// client 中已构建好了所需客户端，此处不用引入 MySQL, gorm 相关依赖  </span></span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p ...)</span></span> Load(...) ... &#123; <span class="comment">// Domain 层 gateway 中接口方法的实现  </span></span><br><span class="line">  record := p.client.FindOne(...)  </span><br><span class="line">  <span class="keyword">return</span> record.ToModel() <span class="comment">// 将 DO（数据对象）转成 Domain 层 model  </span></span><br><span class="line">&#125;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Infrastructure 层中接口方法的实现都需要将结果的数据对象转化成 Domain 层 model 返回，因为领域网关 gateway 中定义的接口方法的入参、出参只能包含同层的 model，不可以有外层的数据类型。</p>
+<p>前文提及的完整调用流程如图 7 所示。</p>
+<p><img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/ddfb29ff5fd613ef1f4e3cbbd210205d.jpeg" alt=""></p>
+<p>图 7 Blog 读取过程时序示意图</p>
+<p>如图，外部请求首先抵达 Adapter 层。如果是读请求，则携带简单参数调用 App 层；如果是写请求，则携带 DTO 调用 App 层。App 层将收到的 DTO 转化成对应的 Model，调用 Domain 层 gateway 相关业务逻辑接口方法。由于系统初始化阶段已经完成依赖注入，接口对应的来自 Infra 层的具体实现会处理完成并返回 Model 到 Domain 层，再由 Domain 层返回到 App 层，最终经由 Adapter 层将响应内容呈现给外部。</p>
+<p>至此可知，参照 COLA 设计的系统分层架构可以一层一层地将业务请求剥离干净，分别处理后再一层一层地组装好返回到请求方。各层之间互不干扰，职责分明，有效地降低了系统组件之间的耦合，提升了系统的可维护性。</p>
+<h3 id="4-总结"><a href="#4-总结" class="headerlink" title="4.总结"></a>4.总结</h3><p>无论哪种架构都不会是项目开发的银弹，也不会有百试百灵的开发方法论。毕竟引入一种架构是有一定复杂度和较高维护成本的，所以开发者需要根据自身项目类型判断是否需要引入架构。</p>
+<p><strong>不建议引入架构的项目类型：</strong></p>
+<ul>
+<li>软件生命周期大概率会小于三个月的</li>
+<li>项目维护人员在现在以及可见的将来只有自己的</li>
+</ul>
+<p><strong>可以考虑引入架构的项目类型：</strong></p>
+<ul>
+<li>软件生命周期大概率会大于三个月的</li>
+<li>项目维护人员多于 1 人的</li>
+</ul>
+<p><strong>强烈建议引入架构的项目类型：</strong></p>
+<ul>
+<li><p>软件生命周期大概率会大于三年的</p>
+</li>
+<li><p>项目维护人员多于 5 人的</p>
+</li>
+</ul>
+<h3 id="5-参考文献"><a href="#5-参考文献" class="headerlink" title="5. 参考文献"></a>5. 参考文献</h3><ul>
+<li>[1] Robert C. Martin, The Clean Architecture, <a target="_blank" rel="noopener" href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html</a> (2012)</li>
+<li>[2] Andrew Gordon, Clean Architecture, <a target="_blank" rel="noopener" href="https://www.andrewgordon.me/posts/Clean-Architecture/">https://www.andrewgordon.me/posts/Clean-Architecture/</a> (2021)</li>
+<li>[3] Pablo Martinez, Hexagonal Architecture, there are always two sides to every story, <a target="_blank" rel="noopener" href="https://medium.com/ssense-tech/hexagonal-architecture-there-are-always-two-sides-to-every-story-bc0780ed7d9c">https://medium.com/ssense-tech/hexagonal-architecture-there-are-always-two-sides-to-every-story-bc0780ed7d9c</a> (2021)</li>
+<li>[4] 张建飞, COLA 4.0：应用架构的最佳实践, <a target="_blank" rel="noopener" href="https://blog.csdn.net/significantfrank/article/details/110934799">https://blog.csdn.net/significantfrank/article/details/110934799</a> (2022)</li>
+<li>[5] Jeffrey Palermo, The Onion Architecture, <a target="_blank" rel="noopener" href="https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/">https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/</a> (2008)</li>
+</ul>
+<p>本文转自 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/I2Fx2TIrwXV2kfLj_T5g5g">https://mp.weixin.qq.com/s/I2Fx2TIrwXV2kfLj_T5g5g</a>，如有侵权，请联系删除。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">donghli</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/I2Fx2TIrwXV2kfLj_T5g5g">https://mp.weixin.qq.com/s/I2Fx2TIrwXV2kfLj_T5g5g</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog.lemongo97.com" target="_blank">LemonGo97のBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Golang/">Golang</a></div><div class="post_share"><div class="social-share" data-image="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/da348609/"><img class="prev-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">如何真正写好Golang代码?</div></div></a></div><div class="next-post pull-right"><a href="/posts/2fe1e71a/"><img class="next-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Golang与Java全方位对比总结</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/posts/4895093/" title="Golang异步编程方式和技巧"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-24</div><div class="relatedPosts_title">Golang异步编程方式和技巧</div></div></a></div><div class="relatedPosts_item"><a href="/posts/3373dbe/" title="Go语言入门分享"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-24</div><div class="relatedPosts_title">Go语言入门分享</div></div></a></div><div class="relatedPosts_item"><a href="/posts/da348609/" title="如何真正写好Golang代码?"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-24</div><div class="relatedPosts_title">如何真正写好Golang代码?</div></div></a></div><div class="relatedPosts_item"><a href="/posts/2fe1e71a/" title="Golang与Java全方位对比总结"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/build-your-applications-with-golang.jpeg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-24</div><div class="relatedPosts_title">Golang与Java全方位对比总结</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font_plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font_minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    window.valine = new Valine({
+      el: '#vcomment',
+      appId: 'w7vT5VedMPyGHyDYppcacmtw-gzGzoHsz',
+      appKey: 'YxBl09Aj50g5Ld621aydI4pz',
+      placeholder: '来和大家一起讨论吧！',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    });
+    if ('nick,mail') { valine.config.requiredFields= 'nick,mail'.split(',') }
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else $.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js', initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div></div></body></html>

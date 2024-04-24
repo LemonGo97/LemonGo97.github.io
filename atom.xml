@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.lemongo97.com/"/>
-  <updated>2024-04-24T03:30:24.000Z</updated>
+  <updated>2024-04-24T06:32:22.000Z</updated>
   <id>https://blog.lemongo97.com/</id>
   
   <author>
@@ -15,6 +15,106 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Golang异步编程方式和技巧</title>
+    <link href="https://blog.lemongo97.com/posts/4895093/"/>
+    <id>https://blog.lemongo97.com/posts/4895093/</id>
+    <published>2024-04-24T06:32:22.000Z</published>
+    <updated>2024-04-24T06:32:22.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Golang" scheme="https://blog.lemongo97.com/tags/Golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何真正写好Golang代码?</title>
+    <link href="https://blog.lemongo97.com/posts/da348609/"/>
+    <id>https://blog.lemongo97.com/posts/da348609/</id>
+    <published>2024-04-24T06:22:11.000Z</published>
+    <updated>2024-04-24T06:22:11.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Golang" scheme="https://blog.lemongo97.com/tags/Golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Golang 整洁架构实践</title>
+    <link href="https://blog.lemongo97.com/posts/6b50a5f8/"/>
+    <id>https://blog.lemongo97.com/posts/6b50a5f8/</id>
+    <published>2024-04-24T06:15:23.000Z</published>
+    <updated>2024-04-24T06:15:23.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Golang" scheme="https://blog.lemongo97.com/tags/Golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Golang与Java全方位对比总结</title>
+    <link href="https://blog.lemongo97.com/posts/2fe1e71a/"/>
+    <id>https://blog.lemongo97.com/posts/2fe1e71a/</id>
+    <published>2024-04-24T05:52:54.000Z</published>
+    <updated>2024-04-24T05:52:54.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Golang" scheme="https://blog.lemongo97.com/tags/Golang/"/>
+    
+  </entry>
   
   <entry>
     <title>Go语言入门分享</title>
@@ -403,108 +503,6 @@
     
     
       <category term="Redis" scheme="https://blog.lemongo97.com/tags/Redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Kubernetes原理与架构初探</title>
-    <link href="https://blog.lemongo97.com/posts/a414d800/"/>
-    <id>https://blog.lemongo97.com/posts/a414d800/</id>
-    <published>2023-01-05T09:37:46.000Z</published>
-    <updated>2023-01-05T09:37:46.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="Kubernetes" scheme="https://blog.lemongo97.com/tags/Kubernetes/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Firewalld 防火墙示例，完整的入门指南</title>
-    <link href="https://blog.lemongo97.com/posts/6cf05f2f/"/>
-    <id>https://blog.lemongo97.com/posts/6cf05f2f/</id>
-    <published>2023-01-05T09:19:46.000Z</published>
-    <updated>2023-01-05T09:19:46.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="firewalld" scheme="https://blog.lemongo97.com/tags/firewalld/"/>
-    
-      <category term="Linux" scheme="https://blog.lemongo97.com/tags/Linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Kubernetes 集群安装记录</title>
-    <link href="https://blog.lemongo97.com/posts/cffb64f7/"/>
-    <id>https://blog.lemongo97.com/posts/cffb64f7/</id>
-    <published>2022-12-20T03:31:07.000Z</published>
-    <updated>2022-12-20T03:31:07.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="kubernetes" scheme="https://blog.lemongo97.com/tags/kubernetes/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>从0到1详解ZooKeeper的应用场景及架构</title>
-    <link href="https://blog.lemongo97.com/posts/15ab9f73/"/>
-    <id>https://blog.lemongo97.com/posts/15ab9f73/</id>
-    <published>2022-05-23T07:21:21.000Z</published>
-    <updated>2022-05-23T07:21:21.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="Zookeeper" scheme="https://blog.lemongo97.com/tags/Zookeeper/"/>
     
   </entry>
   
