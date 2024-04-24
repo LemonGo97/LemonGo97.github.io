@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.lemongo97.com/"/>
-  <updated>2024-04-22T07:58:16.000Z</updated>
+  <updated>2024-04-24T03:30:24.000Z</updated>
   <id>https://blog.lemongo97.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Go语言入门分享</title>
+    <link href="https://blog.lemongo97.com/posts/3373dbe/"/>
+    <id>https://blog.lemongo97.com/posts/3373dbe/</id>
+    <published>2024-04-24T03:30:24.000Z</published>
+    <updated>2024-04-24T03:30:24.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Golang" scheme="https://blog.lemongo97.com/tags/Golang/"/>
+    
+  </entry>
   
   <entry>
     <title>更优雅的使用Gson解析Json</title>
@@ -480,31 +505,6 @@
     
     
       <category term="Zookeeper" scheme="https://blog.lemongo97.com/tags/Zookeeper/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Elasticsearch 基础入门详文</title>
-    <link href="https://blog.lemongo97.com/posts/9c1530a2/"/>
-    <id>https://blog.lemongo97.com/posts/9c1530a2/</id>
-    <published>2022-05-08T14:58:32.000Z</published>
-    <updated>2022-05-08T14:58:32.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="ElasticSearch" scheme="https://blog.lemongo97.com/tags/ElasticSearch/"/>
     
   </entry>
   
