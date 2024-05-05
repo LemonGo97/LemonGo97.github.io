@@ -1,0 +1,604 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Netty In Action -- Bytebuf | LemonGo97のBlog</title><meta name="description" content="BytebufNetty 的数据处理 API 通过两个组件暴露——abstract class ByteBuf和 interface ByteBufHolder。 下面是一些 ByteBuf API 的优点：  它可以被用户自定义的缓冲区类型扩展； 通过内置的复合缓冲区类型实现了透明的零拷贝； 容量可以按需增长（类似于 JDK 的 StringBuilder） ； 在读和写这两种模式之间切换不需要"><meta name="keywords" content="Java,Netty"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/posts/83ca1653/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="article"><meta property="og:title" content="Netty In Action -- Bytebuf"><meta property="og:url" content="https://blog.lemongo97.com/posts/83ca1653/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="BytebufNetty 的数据处理 API 通过两个组件暴露——abstract class ByteBuf和 interface ByteBufHolder。 下面是一些 ByteBuf API 的优点：  它可以被用户自定义的缓冲区类型扩展； 通过内置的复合缓冲区类型实现了透明的零拷贝； 容量可以按需增长（类似于 JDK 的 StringBuilder） ； 在读和写这两种模式之间切换不需要"><meta property="og:image" content="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><meta property="article:published_time" content="2024-05-05T16:17:49.000Z"><meta property="article:modified_time" content="2024-05-05T16:17:49.000Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isSidebar: true,
+  postUpdate: '2024-05-06 00:17:49'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">60</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">39</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">4</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div id="sidebar"><i class="fas fa-arrow-right on" id="toggle-sidebar"></i><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Bytebuf"><span class="toc-number">1.</span> <span class="toc-text">Bytebuf</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ByteBuf-%E7%B1%BB%E2%80%94%E2%80%94Netty-%E7%9A%84%E6%95%B0%E6%8D%AE%E5%AE%B9%E5%99%A8"><span class="toc-number">1.1.</span> <span class="toc-text">ByteBuf 类——Netty 的数据容器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ByteBuf-%E7%9A%84%E4%BD%BF%E7%94%A8%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.1.1.</span> <span class="toc-text">ByteBuf 的使用模式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%BA%A7%E6%93%8D%E4%BD%9C"><span class="toc-number">1.2.</span> <span class="toc-text">字节级操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ByteBufHolder-%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.3.</span> <span class="toc-text">ByteBufHolder 接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ByteBuf-%E5%88%86%E9%85%8D"><span class="toc-number">1.4.</span> <span class="toc-text">ByteBuf 分配</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%89%E9%9C%80%E5%88%86%E9%85%8D%EF%BC%9AByteBufAllocator-%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.4.1.</span> <span class="toc-text">按需分配：ByteBufAllocator 接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Unpooled-%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="toc-number">1.4.2.</span> <span class="toc-text">Unpooled 缓冲区</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ByteBufUtil-%E7%B1%BB"><span class="toc-number">1.4.3.</span> <span class="toc-text">ByteBufUtil 类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0"><span class="toc-number">1.5.</span> <span class="toc-text">引用计数</span></a></li></ol></li></ol></div></div></div><header class="post-bg" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><div id="post-title"><div class="posttitle">Netty In Action -- Bytebuf</div></div><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-05-05T16:17:49.000Z" title="发表于 2024-05-06 00:17:49">2024-05-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-05-05T16:17:49.000Z" title="更新于 2024-05-06 00:17:49">2024-05-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Netty/">Netty</a></span></div><div class="meta-secondline"> </div></div></div></header><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><h2 id="Bytebuf"><a href="#Bytebuf" class="headerlink" title="Bytebuf"></a>Bytebuf</h2><p>Netty 的数据处理 API 通过两个组件暴露——<code>abstract class ByteBuf</code>和 <code>interface ByteBufHolder</code>。</p>
+<p>下面是一些 <code>ByteBuf</code> API 的优点：</p>
+<ul>
+<li>它可以被用户自定义的缓冲区类型扩展；</li>
+<li>通过内置的复合缓冲区类型实现了透明的零拷贝；</li>
+<li>容量可以按需增长（类似于 JDK 的 <code>StringBuilder</code>） ；</li>
+<li>在读和写这两种模式之间切换不需要调用 <code>ByteBuffer</code>的 flip()方法；</li>
+<li>读和写使用了不同的索引；</li>
+<li>支持方法的链式调用；</li>
+<li>支持引用计数；</li>
+<li>支持池化。</li>
+</ul>
+<p>其他类可用于管理 <code>ByteBuf</code>实例的分配，以及执行各种针对数据容器本身和它所持有的数据的操作。</p>
+<h3 id="ByteBuf-类——Netty-的数据容器"><a href="#ByteBuf-类——Netty-的数据容器" class="headerlink" title="ByteBuf 类——Netty 的数据容器"></a><code>ByteBuf</code> 类——Netty 的数据容器</h3><p>因为所有的网络通信都涉及字节序列的移动，所以高效易用的数据结构明显是必不可少的。Netty 的 <code>ByteBuf</code>实现满足并超越了这些需求。</p>
+<p><code>ByteBuf</code>维护了两个不同的索引： 一个用于读取， 一个用于写入。 当你从 <code>ByteBuf</code>读取时，它的 <code>readerIndex</code> 将会被递增已经被读取的字节数。同样地，当你写入 <code>ByteBuf</code> 时，它的<code>writerIndex</code>也会被递增。下图展示了一个空 <code>ByteBuf</code>的布局结构和状态。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240430171212481.png" alt="一个读索引和写索引都设置为 0 的 16 字节 ByteBuf" style="zoom:25%;" />
+
+<p>要了解这些索引两两之间的关系，请考虑一下，如果打算读取字节直到 readerIndex达到和 writerIndex同样的值时会发生什么。在那时，你将会到达“可以读取的”数据的末尾。就如同试图读取超出数组末尾的数据一样，试图读取超出该点的数据将会触发一个 IndexOutOf-BoundsException。</p>
+<p>名称以 read或者 write开头的 ByteBuf方法，将会推进其对应的索引，而名称以 set或者 get开头的操作则不会。后面的这些方法将在作为一个参数传入的一个相对索引上执行操作。</p>
+<p>可以指定 ByteBuf的最大容量。试图移动写索引（即 writerIndex）超过这个值将会触发一个异常(也就是说用户直接或者间接使 capacity(int)或者 ensureWritable(int)方法来增加超过该最大容量时抛出异常。)。 （默认的限制是 Integer.MAX_VALUE。 ）</p>
+<h4 id="ByteBuf-的使用模式"><a href="#ByteBuf-的使用模式" class="headerlink" title="ByteBuf 的使用模式"></a>ByteBuf 的使用模式</h4><p><strong>堆缓冲区</strong></p>
+<p>最常用的 ByteBuf 模式是将数据存储在 JVM 的堆空间中。这种模式被称为支撑数组（backing array） ，它能在没有使用池化的情况下提供快速的分配和释放。这种方式，如下所示，非常适合于有遗留的数据需要处理的情况。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuf</span> <span class="variable">heapBuf</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// 检查 ByteBuf 是否有一个支撑数组</span></span><br><span class="line"><span class="keyword">if</span> (heapBuf.hasArray()) &#123;</span><br><span class="line">  <span class="comment">// 如果有，则获取对该数组的引用</span></span><br><span class="line">  <span class="type">byte</span>[] array = heapBuf.array();</span><br><span class="line">  <span class="comment">// 计算第一个字节的偏移量</span></span><br><span class="line">  <span class="type">int</span> <span class="variable">offset</span> <span class="operator">=</span> heapBuf.arrayOffset() + heapBuf.readerIndex();</span><br><span class="line">  <span class="comment">// 获得可读字节数</span></span><br><span class="line">  <span class="type">int</span> <span class="variable">length</span> <span class="operator">=</span> heapBuf.readableBytes();</span><br><span class="line">  <span class="comment">// 使用数组、偏移量和长度作为参数调用你的方法</span></span><br><span class="line">  handleArray(array, offset, length);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当 hasArray()方法返回 false 时，尝试访问支撑数组将触发一个 UnsupportedOperationException。这个模式类似于 JDK 的 ByteBuffer的用法。</p>
+</blockquote>
+<p><strong>直接缓冲区</strong></p>
+<p>直接缓冲区是另外一种 ByteBuf模式。我们期望用于对象创建的内存分配永远都来自于堆中，但这并不是必需的——NIO 在 JDK 1.4 中引入的 ByteBuffer类允许 JVM 实现通过本地调用来分配内存。这主要是为了避免在每次调用本地 I/O 操作之前（或者之后）将缓冲区的内容复制到一个中间缓冲区（或者从中间缓冲区把内容复制到缓冲区） 。</p>
+<p>ByteBuffer的 Javadoc明确指出： “直接缓冲区的内容将驻留在常规的会被垃圾回收的堆之外。 ”这也就解释了为何直接缓冲区对于网络数据传输是理想的选择。如果你的数据包含在一个在堆上分配的缓冲区中，那么事实上，在通过套接字发送它之前，JVM 将会在内部把你的缓冲区复制到一个直接缓冲区中。</p>
+<p>直接缓冲区的主要缺点是，相对于基于堆的缓冲区，它们的分配和释放都较为昂贵。如果你正在处理遗留代码，你也可能会遇到另外一个缺点：因为数据不是在堆上，所以你不得不进行一次复制，如下所示。</p>
+<p>显然，与使用支撑数组相比，这涉及的工作更多。因此，如果事先知道容器中的数据将会被作为数组来访问，你可能更愿意使用堆内存。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuf</span> <span class="variable">directBuf</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// 检查 ByteBuf 是否由数组支撑。如果不是，则这是一个直接缓冲区</span></span><br><span class="line"><span class="keyword">if</span> (!directBuf.hasArray()) &#123;</span><br><span class="line">  <span class="comment">// 获取可读字节数</span></span><br><span class="line">  <span class="type">int</span> <span class="variable">length</span> <span class="operator">=</span> directBuf.readableBytes();</span><br><span class="line">  <span class="comment">// 分配一个新的数组来保存具有该长度的字节数据</span></span><br><span class="line">  <span class="type">byte</span>[] array = <span class="keyword">new</span> <span class="title class_">byte</span>[length];</span><br><span class="line">  <span class="comment">// 将字节复制到该数组</span></span><br><span class="line">  directBuf.getBytes(directBuf.readerIndex(), array);</span><br><span class="line">  <span class="comment">// 使用数组、偏移量和长度作为参数调用你的方法</span></span><br><span class="line">  handleArray(array, <span class="number">0</span>, length);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>复合缓冲区</strong></p>
+<p>第三种也是最后一种模式使用的是复合缓冲区，它为多个 ByteBuf提供一个聚合视图。在这里你可以根据需要添加或者删除 ByteBuf实例，这是一个 JDK 的 ByteBuffer实现完全缺失的特性。</p>
+<p>Netty 通过一个 ByteBuf子类——CompositeByteBuf——实现了这个模式，它提供了一个将多个缓冲区表示为单个合并缓冲区的虚拟表示。</p>
+<blockquote>
+<p><strong>警告</strong> </p>
+<p>​    CompositeByteBuf中的 ByteBuf实例可能同时包含直接内存分配和非直接内存分配。如果其中只有一个实例，那么对 CompositeByteBuf 上的 hasArray()方法的调用将返回该组件上的 hasArray()方法的值；否则它将返回 false。</p>
+</blockquote>
+<p>为了举例说明，让我们考虑一下一个由两部分——头部和主体——组成的将通过 HTTP 协议传输的消息。这两部分由应用程序的不同模块产生， 将会在消息被发送的时候组装。该应用程序可以选择为多个消息重用相同的消息主体。当这种情况发生时，对于每个消息都将会创建一个新的头部。</p>
+<p>因为我们不想为每个消息都重新分配这两个缓冲区， 所以使用 CompositeByteBuf是一个完美的选择。 它在消除了没必要的复制的同时， 暴露了通用的 ByteBuf API。下图展示了生成的消息布局。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240430172441645.png" alt="持有一个头部和主体的 CompositeByteBuf" style="zoom:25%;" />
+
+<p>下面的代码展示了如何通过使用 JDK 的 ByteBuffer来实现这一需求。创建了一个包含两个 ByteBuffer的数组用来保存这些消息组件，同时创建了第三个 ByteBuffer用来保存所有这些数据的副本。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Use an array to hold the message parts</span></span><br><span class="line">ByteBuffer[] message = <span class="keyword">new</span> <span class="title class_">ByteBuffer</span>[] &#123; header, body &#125;;</span><br><span class="line"><span class="comment">// Create a new ByteBuffer and use copy to merge the header and body</span></span><br><span class="line"><span class="type">ByteBuffer</span> <span class="variable">message2</span> <span class="operator">=</span> ByteBuffer.allocate(header.remaining() + body.remaining());</span><br><span class="line">message2.put(header);</span><br><span class="line">message2.put(body);</span><br><span class="line">message2.flip();</span><br></pre></td></tr></table></figure>
+
+<p>分配和复制操作，以及伴随着对数组管理的需要，使得这个版本的实现效率低下而且笨拙。下面的代码展示了一个使用了 CompositeByteBuf的版本。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CompositeByteBuf</span> <span class="variable">messageBuf</span> <span class="operator">=</span> Unpooled.compositeBuffer();</span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">headerBuf</span> <span class="operator">=</span> ...; <span class="comment">// can be backing or direct</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">bodyBuf</span> <span class="operator">=</span> ...; <span class="comment">// can be backing or direct</span></span><br><span class="line"><span class="comment">// 将 ByteBuf 实例追加到 CompositeByteBuf</span></span><br><span class="line">messageBuf.addComponents(headerBuf, bodyBuf);</span><br><span class="line">.....</span><br><span class="line"><span class="comment">//删除位于索引位置为 0（第一个组件）的 ByteBuf</span></span><br><span class="line">messageBuf.removeComponent(<span class="number">0</span>); <span class="comment">// remove the header</span></span><br><span class="line"><span class="comment">// 循环遍历所有的 ByteBuf 实例</span></span><br><span class="line"><span class="keyword">for</span> (ByteBuf buf : messageBuf) &#123;</span><br><span class="line">	System.out.println(buf.toString());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CompositeByteBuf可能不支持访问其支撑数组，因此访问 CompositeByteBuf中的数据类似于（访问）直接缓冲区的模式，如下面的代码所示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CompositeByteBuf</span> <span class="variable">compBuf</span> <span class="operator">=</span> Unpooled.compositeBuffer();</span><br><span class="line"><span class="comment">// 获得可读字节数</span></span><br><span class="line"><span class="type">int</span> <span class="variable">length</span> <span class="operator">=</span> compBuf.readableBytes();</span><br><span class="line"><span class="comment">// 分配一个具有可读字节数长度的新数组</span></span><br><span class="line"><span class="type">byte</span>[] array = <span class="keyword">new</span> <span class="title class_">byte</span>[length];</span><br><span class="line"><span class="comment">// 将字节读到该数组中</span></span><br><span class="line">compBuf.getBytes(compBuf.readerIndex(), array);</span><br><span class="line"><span class="comment">// 使用偏移量和长度作为参数使用该数组</span></span><br><span class="line">handleArray(array, <span class="number">0</span>, array.length);</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是， Netty使用了CompositeByteBuf来优化套接字的I/O操作，尽可能地消除了由JDK的缓冲区实现所导致的性能以及内存使用率的惩罚。 </p>
+<blockquote>
+<p>这尤其适用于 JDK 所使用的一种称为分散/收集 I/O（Scatter/Gather I/O）的技术，定义为“一种输入和输出的方法，其中，单个系统调用从单个数据流写到一组缓冲区中，或者，从单个数据源读到一组缓冲区中” 。《Linux System Programming》，作者 Robert Love（O’Reilly, 2007）</p>
+</blockquote>
+<p>这种优化发生在Netty的核心代码中，因此不会被暴露出来，但是你应该知道它所带来的影响。</p>
+<blockquote>
+<p><strong>CompositeByteBuf API</strong> 除了从 ByteBuf继承的方法，CompositeByteBuf提供了大量的附加功能。请参考 Netty 的 Javadoc 以获得该 API 的完整列表。</p>
+</blockquote>
+<h3 id="字节级操作"><a href="#字节级操作" class="headerlink" title="字节级操作"></a>字节级操作</h3><p>ByteBuf 提供了许多超出基本读、写操作的方法用于修改它的数据。</p>
+<p><strong>随机访问索引</strong></p>
+<p>如同在普通的 Java 字节数组中一样，ByteBuf的索引是从零开始的：第一个字节的索引是0，最后一个字节的索引总是 capacity() - 1。下列代码表明，对存储机制的封装使得遍历 ByteBuf的内容非常简单。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; buffer.capacity(); i++) &#123;</span><br><span class="line">  <span class="type">byte</span> <span class="variable">b</span> <span class="operator">=</span> buffer.getByte(i);</span><br><span class="line">  System.out.println((<span class="type">char</span>)b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是， 使用那些需要一个索引值参数的方法（的其中）之一来访问数据既不会改变readerIndex也不会改变 writerIndex。如果有需要， 也可以通过调用 readerIndex(index)或者 writerIndex(index)来手动移动这两者。</p>
+<p><strong>顺序访问索引</strong></p>
+<p>虽然 ByteBuf同时具有读索引和写索引，但是 JDK 的 ByteBuffer却只有一个索引，这也就是为什么必须调用 flip()方法来在读模式和写模式之间进行切换的原因。下图展示了ByteBuf是如何被它的两个索引划分成 3 个区域的。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240430174156315.png" alt="ByteBuf的内部分段" style="zoom:35%;" />
+
+<p><strong>可丢弃字节</strong></p>
+<p>在上图中标记为可丢弃字节的分段包含了已经被读过的字节。通过调用 discardRead-Bytes()方法， 可以丢弃它们并回收空间。这个分段的初始大小为 0，存储在 readerIndex中，会随着 read操作的执行而增加（<code>get*</code>操作不会移动 readerIndex）。</p>
+<p>下图展示了上图中所展示的缓冲区上调用discardReadBytes()方法后的结果。可以看到，可丢弃字节分段中的空间已经变为可写的了。注意，在调用discardReadBytes()之后，对可写分段的内容并没有任何的保证。</p>
+<blockquote>
+<p>因为只是移动了可以读取的字节以及 writerIndex，而没有对所有可写入的字节进行擦除写</p>
+</blockquote>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240430175702942.png" alt="丢弃已读字节之后的 ByteBuf" style="zoom:40%;" />
+
+<p>虽然你可能会倾向于频繁地调用 discardReadBytes()方法以确保可写分段的最大化，但是请注意，这将极有可能会导致内存复制，因为可读字节（图中标记为 CONTENT 的部分）必须被移动到缓冲区的开始位置。我们建议只在有真正需要的时候才这样做，例如，当内存非常宝贵的时候。</p>
+<p><strong>可读字节</strong></p>
+<p>ByteBuf 的可读字节分段存储了实际数据。新分配的、包装的或者复制的缓冲区的默认的readerIndex 值为 0。任何名称以 read 或者 skip 开头的操作都将检索或者跳过位于当前readerIndex的数据，并且将它增加已读字节数。</p>
+<p>如果被调用的方法需要一个 ByteBuf参数作为写入的目标，并且没有指定目标索引参数，那么该目标缓冲区的 writerIndex也将被增加，例如：<code>readBytes(ByteBuf dest);</code></p>
+<p>如果尝试在缓冲区的可读字节数已经耗尽时从中读取数据，那么将会引发一个 IndexOutOfBoundsException。</p>
+<p>下面代码展示了如何读取所有可以读的字节。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="keyword">while</span> (buffer.isReadable()) &#123;</span><br><span class="line">  System.out.println(buffer.readByte());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>可写字节</strong></p>
+<p>可写字节分段是指一个拥有未定义内容的、写入就绪的内存区域。新分配的缓冲区的writerIndex 的默认值为 0。任何名称以 write 开头的操作都将从当前的 writerIndex 处开始写数据，并将它增加已经写入的字节数。如果写操作的目标也是 ByteBuf，并且没有指定源索引的值，则源缓冲区的 readerIndex也同样会被增加相同的大小。这个调用如下所示：<code>writeBytes(ByteBuf dest);</code></p>
+<p>如果尝试往目标写入超过目标容量的数据，将会引发一个 IndexOutOfBoundException①。</p>
+<p>下列代码是一个用随机整数值填充缓冲区，直到它空间不足为止的例子。writableBytes()方法在这里被用来确定该缓冲区中是否还有足够的空间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Fills the writable bytes of a buffer with random integers.</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="keyword">while</span> (buffer.writableBytes() &gt;= <span class="number">4</span>) &#123;</span><br><span class="line">	buffer.writeInt(random.nextInt());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>索引管理</strong></p>
+<p>JDK 的 InputStream 定义了 mark(int readlimit)和 reset()方法，这些方法分别被用来将流中的当前位置标记为指定的值，以及将流重置到该位置。</p>
+<p>同样，可以通过调用 markReaderIndex()、 markWriterIndex()、 resetWriterIndex()和 resetReaderIndex()来标记和重置 ByteBuf的 readerIndex和 writerIndex。这些和InputStream上的调用类似，只是没有 readlimit参数来指定标记什么时候失效。</p>
+<p>也可以通过调用 readerIndex(int)或者 writerIndex(int)来将索引移动到指定位置。 试图将任何一个索引设置到一个无效的位置都将导致一个 IndexOutOfBoundsException。</p>
+<p>可以通过调用 clear()方法来将 readerIndex和 writerIndex都设置为 0。注意，这并不会清除内存中的内容。下图展示了它是如何工作的。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240430174156315.png" alt="ByteBuf的内部分段" style="zoom:35%;" />
+
+<p>和之前一样， ByteBuf包含 3 个分段。 下图展示了在 clear()方法被调用之后 ByteBuf的状态</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240430180300024.png" alt="在 clear()方法被调用之后" style="zoom:33%;" />
+
+<p>调用 clear()比调用 discardReadBytes()轻量得多，因为它将只是重置索引而不会复制任何的内存。</p>
+<p><strong>查找操作</strong></p>
+<p>在 ByteBuf 中有多种可以用来确定指定值的索引的方法。最简单的是使用 indexOf()方法。较复杂的查找可以通过那些需要一个 ByteBufProcessor(在 Netty 4.1.x 中，该类已经废弃，请使用 io.netty.util.ByteProcessor)作为参数的方法达成。这个接口只定义了一个方法：<code>boolean process(byte value)</code>它将检查输入值是否是正在查找的值。</p>
+<p>ByteBufProcessor针对一些常见的值定义了许多便利的方法。假设你的应用程序需要和所谓的包含有以 NULL 结尾的内容的 Flash 套接字集成。调用<code>forEachByte(ByteBufProcessor.FIND_NUL)</code>将简单高效地消费该 Flash 数据，因为在处理期间只会执行较少的边界检查。</p>
+<p>下列代码展示了一个查找回车符（<code>\r</code>）的例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> buffer.forEachByte(ByteBufProcessor.FIND_CR);</span><br></pre></td></tr></table></figure>
+
+<p><strong>派生缓冲区</strong></p>
+<p>派生缓冲区为 ByteBuf提供了以专门的方式来呈现其内容的视图。这类视图是通过以下方法被创建的：</p>
+<ul>
+<li>duplicate()；</li>
+<li>slice()；</li>
+<li>slice(int, int)；</li>
+<li>Unpooled.unmodifiableBuffer(…)；</li>
+<li>order(ByteOrder)；</li>
+<li>readSlice(int)。</li>
+</ul>
+<p>每个这些方法都将返回一个新的 ByteBuf 实例，它具有自己的读索引、写索引和标记索引。其内部存储和 JDK 的 ByteBuffer 一样也是共享的。这使得派生缓冲区的创建成本是很低廉的，但是这也意味着，如果你修改了它的内容，也同时修改了其对应的源实例，所以要小心。</p>
+<blockquote>
+<p>*<em>ByteBuf 复制 *</em></p>
+<p>如果需要一个现有缓冲区的真实副本，请使用 copy()或者 copy(int, int)方法。不同于派生缓冲区，由这个调用所返回的 ByteBuf拥有独立的数据副本。</p>
+</blockquote>
+<p>下列代码展示了如何使用 slice(int, int)方法来操作 ByteBuf的一个分段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Charset</span> <span class="variable">utf8</span> <span class="operator">=</span> Charset.forName(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line"><span class="comment">// 创建一个用于保存给定字符串的字节的 ByteBuf</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">buf</span> <span class="operator">=</span> Unpooled.copiedBuffer(<span class="string">&quot;Netty in Action rocks!&quot;</span>, utf8);</span><br><span class="line"><span class="comment">// 创建该 ByteBuf 从索引 0 开始到索引 15结束的一个新切片</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">sliced</span> <span class="operator">=</span> buf.slice(<span class="number">0</span>, <span class="number">15</span>);</span><br><span class="line"><span class="comment">// 将打印 “Netty in Action”</span></span><br><span class="line">System.out.println(sliced.toString(utf8));</span><br><span class="line"><span class="comment">// 更新索引 0 处的字节</span></span><br><span class="line">buf.setByte(<span class="number">0</span>, (<span class="type">byte</span>)<span class="string">&#x27;J&#x27;</span>);</span><br><span class="line"><span class="comment">// 将会成功，因为数据是共享的，对其中一个所做的更改对另外一个也是可见的</span></span><br><span class="line"><span class="keyword">assert</span> buf.getByte(<span class="number">0</span>) == sliced.getByte(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p>现在，让我们看看 ByteBuf的分段的副本和切片有何区别，如下所示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Charset</span> <span class="variable">utf8</span> <span class="operator">=</span> Charset.forName(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line"><span class="comment">// 创建 ByteBuf 以保存所提供的字符串的字节</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">buf</span> <span class="operator">=</span> Unpooled.copiedBuffer(<span class="string">&quot;Netty in Action rocks!&quot;</span>, utf8);</span><br><span class="line"><span class="comment">// 创建该 ByteBuf 从索引 0 开始到索引 15结束的分段的副本</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">copy</span> <span class="operator">=</span> buf.copy(<span class="number">0</span>, <span class="number">15</span>);</span><br><span class="line"><span class="comment">// 将打印 “Netty in Action”</span></span><br><span class="line">System.out.println(copy.toString(utf8));</span><br><span class="line"><span class="comment">// 更新索引 0 处的字节</span></span><br><span class="line">buf.setByte(<span class="number">0</span>, (<span class="type">byte</span>) <span class="string">&#x27;J&#x27;</span>);</span><br><span class="line"><span class="comment">// 将会成功，因为数据不是共享的</span></span><br><span class="line"><span class="keyword">assert</span> buf.getByte(<span class="number">0</span>) != copy.getByte(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p>除了修改原始 ByteBuf的切片或者副本的效果以外，这两种场景是相同的。只要有可能，使用 slice()方法来避免复制内存的开销。</p>
+<p><strong>读/写操作</strong></p>
+<p>正如我们所提到过的，有两种类别的读/写操作：</p>
+<ul>
+<li><p>get()和 set()操作，从给定的索引开始，并且保持索引不变；</p>
+</li>
+<li><p>read()和 write()操作，从给定的索引开始，并且会根据已经访问过的字节数对索引进行调整。</p>
+</li>
+</ul>
+<p>下面列举了最常用的 get()方法</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>getBoolean(int)</td>
+<td>返回给定索引处的 Boolean值</td>
+</tr>
+<tr>
+<td>getByte(int)</td>
+<td>返回给定索引处的字节</td>
+</tr>
+<tr>
+<td>getUnsignedByte(int)</td>
+<td>将给定索引处的无符号字节值作为 short返回</td>
+</tr>
+<tr>
+<td>getMedium(int)</td>
+<td>返回给定索引处的 24 位的中等 int值</td>
+</tr>
+<tr>
+<td>getUnsignedMedium(int)</td>
+<td>返回给定索引处的无符号的 24 位的中等 int值</td>
+</tr>
+<tr>
+<td>getInt(int)</td>
+<td>返回给定索引处的 int值</td>
+</tr>
+<tr>
+<td>getUnsignedInt(int)</td>
+<td>将给定索引处的无符号 int值作为 long返回</td>
+</tr>
+<tr>
+<td>getLong(int)</td>
+<td>返回给定索引处的 long值</td>
+</tr>
+<tr>
+<td>getShort(int)</td>
+<td>返回给定索引处的 short值</td>
+</tr>
+<tr>
+<td>getUnsignedShort(int)</td>
+<td>将给定索引处的无符号 short值作为 int返回</td>
+</tr>
+<tr>
+<td>getBytes(int, …)</td>
+<td>将该缓冲区中从给定索引开始的数据传送到指定的目的地</td>
+</tr>
+</tbody></table>
+<p>大多数的这些操作都有一个对应的 set()方法</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>setBoolean(int, boolean)</td>
+<td>设定给定索引处的 Boolean值</td>
+</tr>
+<tr>
+<td>setByte(int index, int value)</td>
+<td>设定给定索引处的字节值</td>
+</tr>
+<tr>
+<td>setMedium(int index, int value)</td>
+<td>设定给定索引处的 24 位的中等 int值</td>
+</tr>
+<tr>
+<td>setInt(int index, int value)</td>
+<td>设定给定索引处的 int值</td>
+</tr>
+<tr>
+<td>setLong(int index, long value)</td>
+<td>设定给定索引处的 long值</td>
+</tr>
+<tr>
+<td>setShort(int index, int value)</td>
+<td>设定给定索引处的 short值</td>
+</tr>
+</tbody></table>
+<p>下列代码说明了 get()和 set()方法的用法，表明了它们不会改变读索引和写索引。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Charset</span> <span class="variable">utf8</span> <span class="operator">=</span> Charset.forName(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line"><span class="comment">// 创建一个新的 ByteBuf以保存给定字符串的字节</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">buf</span> <span class="operator">=</span> Unpooled.copiedBuffer(<span class="string">&quot;Netty in Action rocks!&quot;</span>, utf8);</span><br><span class="line"><span class="comment">// 打印第一个字符&#x27;N&#x27;</span></span><br><span class="line">System.out.println((<span class="type">char</span>)buf.getByte(<span class="number">0</span>));</span><br><span class="line"><span class="comment">// 存储当前的 readerIndex 和 writerIndex</span></span><br><span class="line"><span class="type">int</span> <span class="variable">readerIndex</span> <span class="operator">=</span> buf.readerIndex();</span><br><span class="line"><span class="type">int</span> <span class="variable">writerIndex</span> <span class="operator">=</span> buf.writerIndex();</span><br><span class="line"><span class="comment">// 将索引 0 处的字节更新为字符&#x27;B&#x27;</span></span><br><span class="line">buf.setByte(<span class="number">0</span>, (<span class="type">byte</span>)<span class="string">&#x27;B&#x27;</span>);</span><br><span class="line"><span class="comment">// 打印第一个字符，现在是&#x27;B&#x27;</span></span><br><span class="line">System.out.println((<span class="type">char</span>)buf.getByte(<span class="number">0</span>));</span><br><span class="line"><span class="comment">// 将会成功，因为这些操作并不会修改相应的索引</span></span><br><span class="line"><span class="keyword">assert</span> readerIndex == buf.readerIndex();</span><br><span class="line"><span class="keyword">assert</span> writerIndex == buf.writerIndex();</span><br></pre></td></tr></table></figure>
+
+<p>现在，让我们研究一下 read()操作，其作用于当前的 readerIndex或 writerIndex。</p>
+<p>这些方法将用于从 ByteBuf中读取数据，如同它是一个流。下表展示了最常用的方法。</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>readBoolean()</td>
+<td>返回当前 readerIndex处的 Boolean，并将 readerIndex增加 1</td>
+</tr>
+<tr>
+<td>readByte()</td>
+<td>返回当前 readerIndex处的字节，并将 readerIndex增加 1</td>
+</tr>
+<tr>
+<td>readUnsignedByte()</td>
+<td>将 当 前 readerIndex 处 的 无 符 号 字 节 值 作 为 short 返 回 ， 并 将readerIndex增加 1</td>
+</tr>
+<tr>
+<td>readMedium()</td>
+<td>返回当前 readerIndex处的 24 位的中等 int值，并将 readerIndex增加 3</td>
+</tr>
+<tr>
+<td>readUnsignedMedium()</td>
+<td>返回当前 readerIndex 处的 24 位的无符号的中等 int 值，并将readerIndex增加 3</td>
+</tr>
+<tr>
+<td>readInt() v返回当前 readerIndex的 int值，并将 readerIndex增加 4</td>
+<td></td>
+</tr>
+<tr>
+<td>readUnsignedInt()</td>
+<td>将当前 readerIndex 处的无符号的 int 值作为 long 值返回，并将readerIndex增加 4</td>
+</tr>
+<tr>
+<td>readLong()</td>
+<td>返回当前 readerIndex处的 long值，并将 readerIndex增加 8</td>
+</tr>
+<tr>
+<td>readShort()</td>
+<td>返回当前 readerIndex处的 short值，并将 readerIndex增加 2</td>
+</tr>
+<tr>
+<td>readUnsignedShort()</td>
+<td>将当前 readerIndex 处的无符号 short 值作为 int 值返回，并将readerIndex增加 2</td>
+</tr>
+<tr>
+<td>`readBytes(ByteBuf</td>
+<td>byte[] destination, int dstIndex [,int length])`</td>
+</tr>
+</tbody></table>
+<p>几乎每个 read()方法都有对应的 write()方法，用于将数据追加到 ByteBuf中。注意，下表中所列出的这些方法的参数是需要写入的值，而不是索引值。</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>writeBoolean(boolean)</td>
+<td>在当前 writerIndex处写入一个 Boolean，并将 writerIndex增加 1</td>
+</tr>
+<tr>
+<td>writeByte(int)</td>
+<td>在当前 writerIndex处写入一个字节值，并将 writerIndex增加 1</td>
+</tr>
+<tr>
+<td>writeMedium(int)</td>
+<td>在当前 writerIndex 处写入一个中等的 int 值，并将 writerIndex增加 3</td>
+</tr>
+<tr>
+<td>writeInt(int)</td>
+<td>在当前 writerIndex处写入一个 int值，并将 writerIndex增加 4</td>
+</tr>
+<tr>
+<td>writeLong(long)</td>
+<td>在当前 writerIndex处写入一个 long值，并将 writerIndex增加 8</td>
+</tr>
+<tr>
+<td>writeShort(int)</td>
+<td>在当前 writerIndex处写入一个 short值，并将 writerIndex增加 2</td>
+</tr>
+<tr>
+<td>`writeBytes(source ByteBuf</td>
+<td>byte[] [,int srcIndex, int length])`</td>
+</tr>
+</tbody></table>
+<p>下面的代码展示了如何使用这些方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Charset</span> <span class="variable">utf8</span> <span class="operator">=</span> Charset.forName(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line"><span class="comment">// 创建一个新的 ByteBuf 以保存给定字符串的字节</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">buf</span> <span class="operator">=</span> Unpooled.copiedBuffer(<span class="string">&quot;Netty in Action rocks!&quot;</span>, utf8);</span><br><span class="line"><span class="comment">// 打印第一个字符&#x27;N&#x27;</span></span><br><span class="line">System.out.println((<span class="type">char</span>)buf.readByte());</span><br><span class="line"><span class="comment">// 存储当前的readerIndex</span></span><br><span class="line"><span class="type">int</span> <span class="variable">readerIndex</span> <span class="operator">=</span> buf.readerIndex();</span><br><span class="line"><span class="comment">// 存储当前的writerIndex</span></span><br><span class="line"><span class="type">int</span> <span class="variable">writerIndex</span> <span class="operator">=</span> buf.writerIndex();</span><br><span class="line"><span class="comment">// 将字符&#x27;?&#x27;追加到缓冲区</span></span><br><span class="line">buf.writeByte((<span class="type">byte</span>)<span class="string">&#x27;?&#x27;</span>);</span><br><span class="line"><span class="comment">// 将会成功，因为 writeByte()方法移动了 writerIndex</span></span><br><span class="line"><span class="keyword">assert</span> readerIndex == buf.readerIndex();</span><br><span class="line"><span class="keyword">assert</span> writerIndex != buf.writerIndex();</span><br></pre></td></tr></table></figure>
+
+<p><strong>更多的操作</strong></p>
+<p>下表列举了由 ByteBuf提供的其他有用操作</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>isReadable()</td>
+<td>如果至少有一个字节可供读取，则返回 true</td>
+</tr>
+<tr>
+<td>isWritable()</td>
+<td>如果至少有一个字节可被写入，则返回 true</td>
+</tr>
+<tr>
+<td>readableBytes()</td>
+<td>返回可被读取的字节数</td>
+</tr>
+<tr>
+<td>writableBytes()</td>
+<td>返回可被写入的字节数</td>
+</tr>
+<tr>
+<td>capacity()</td>
+<td>返回 ByteBuf可容纳的字节数。在此之后，它会尝试再次扩展直到达到 maxCapacity()</td>
+</tr>
+<tr>
+<td>maxCapacity()</td>
+<td>返回 ByteBuf可以容纳的最大字节数</td>
+</tr>
+<tr>
+<td>hasArray()</td>
+<td>如果 ByteBuf由一个字节数组支撑，则返回 true</td>
+</tr>
+<tr>
+<td>array()</td>
+<td>如果 ByteBuf由一个字节数组支撑则返回该数组；否则，它将抛出一个UnsupportedOperationException异常</td>
+</tr>
+</tbody></table>
+<h3 id="ByteBufHolder-接口"><a href="#ByteBufHolder-接口" class="headerlink" title="ByteBufHolder 接口"></a>ByteBufHolder 接口</h3><p>我们经常发现，除了实际的数据负载之外，我们还需要存储各种属性值。HTTP 响应便是一个很好的例子，除了表示为字节的内容，还包括状态码、cookie 等。为了处理这种常见的用例，Netty 提供了 ByteBufHolder。ByteBufHolder也为 Netty 的高级特性提供了支持，如缓冲区池化，其中可以从池中借用 ByteBuf，并且在需要时自动释放。ByteBufHolder只有几种用于访问底层数据和引用计数的方法。下表列出了它们（这里不包括它继承自 ReferenceCounted的那些方法） 。</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>content()</td>
+<td>返回由这个 ByteBufHolder所持有的 ByteBuf</td>
+</tr>
+<tr>
+<td>copy()</td>
+<td>返回这个 ByteBufHolder的一个深拷贝，包括一个其所包含的 ByteBuf的非共享副本</td>
+</tr>
+<tr>
+<td>duplicate()</td>
+<td>返回这个 ByteBufHolder的一个浅拷贝，包括一个其所包含的 ByteBuf的共享副本</td>
+</tr>
+</tbody></table>
+<p>如果想要实现一个将其有效负载存储在 ByteBuf中的消息对象， 那么 ByteBufHolder将是个不错的选择。</p>
+<h3 id="ByteBuf-分配"><a href="#ByteBuf-分配" class="headerlink" title="ByteBuf 分配"></a>ByteBuf 分配</h3><h4 id="按需分配：ByteBufAllocator-接口"><a href="#按需分配：ByteBufAllocator-接口" class="headerlink" title="按需分配：ByteBufAllocator 接口"></a>按需分配：ByteBufAllocator 接口</h4><p>为了降低分配和释放内存的开销，Netty 通过 interface ByteBufAllocator 实现了（ByteBuf的）池化，它可以用来分配我们所描述过的任意类型的 ByteBuf实例。使用池化是特定于应用程序的决定，其并不会以任何方式改变 ByteBuf API（的语义） </p>
+<p>下表列出了 ByteBufAllocator提供的一些操作。</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>buffer()</code><br><code>buffer(int initialCapacity);</code><br><code>buffer(int initialCapacity, int maxCapacity);</code></td>
+<td>返回一个基于堆或者直接内存存储的 ByteBuf</td>
+</tr>
+<tr>
+<td><code>heapBuffer()</code><br><code>heapBuffer(int initialCapacity)</code><br><code>heapBuffer(int initialCapacity, int maxCapacity)</code></td>
+<td>返回一个基于堆内存存储的ByteBuf</td>
+</tr>
+<tr>
+<td><code>directBuffer()</code><br><code>directBuffer(int initialCapacity)</code><br><code>directBuffer(int initialCapacity, int maxCapacity)</code></td>
+<td>返回一个基于直接内存存储的ByteBuf</td>
+</tr>
+<tr>
+<td><code>compositeBuffer()</code><br><code>compositeBuffer(int maxNumComponents)</code><br><code>compositeDirectBuffer()</code><br><code>compositeDirectBuffer(int maxNumComponents);</code><br><code>compositeHeapBuffer()</code><br><code>compositeHeapBuffer(int maxNumComponents);</code></td>
+<td>返回一个可以通过添加最大到指定数目的基于堆的或者直接内存存储的缓冲区来扩展的CompositeByteBuf</td>
+</tr>
+<tr>
+<td><code>ioBuffer()</code></td>
+<td>返回一个用于套接字的 I/O 操作的 ByteBuf</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>ioBuffer()</strong><br>   默认地，当所运行的环境具有 sun.misc.Unsafe支持时，返回基于直接内存存储的 ByteBuf，否则返回基于堆内存存储的 ByteBuf；当指定使用 PreferHeapByteBufAllocator时，则只会返回基于堆内存存储的 ByteBuf</p>
+</blockquote>
+<p>可以通过 Channel（每个都可以有一个不同的 ByteBufAllocator 实例）或者绑定到ChannelHandler的 ChannelHandlerContext获取一个到 ByteBufAllocator的引用。下面的代码说明了这两种方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Channel</span> <span class="variable">channel</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// 从 Channel 获取一个到ByteBufAllocator 的引用</span></span><br><span class="line"><span class="type">ByteBufAllocator</span> <span class="variable">allocator</span> <span class="operator">=</span> channel.alloc();</span><br><span class="line">....</span><br><span class="line"><span class="type">ChannelHandlerContext</span> <span class="variable">ctx</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// 从 ChannelHandlerContext 获取一个到 ByteBufAllocator 的引用</span></span><br><span class="line"><span class="type">ByteBufAllocator</span> <span class="variable">allocator2</span> <span class="operator">=</span> ctx.alloc();</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>Netty 提供了两种 ByteBufAllocator的实现：PooledByteBufAllocator和 Unpooled-ByteBufAllocator。前者池化了 ByteBuf 的实例以提高性能并最大限度地减少内存碎片。此实现使用了一种称为 jemalloc的已被大量现代操作系统所采用的高效方法来分配内存。后者的实池化ByteBuf实例，并且在每次它被调用时都会返回一个新的实例。</p>
+<p>虽然Netty默认使用了PooledByteBufAllocator，但这可以很容易地通过ChannelConfig API或者在引导你的应用程序时指定一个不同的分配器来更改。</p>
+<blockquote>
+<p>这里指 Netty4.1.x，Netty4.0.x 默认使用的是 UnpooledByteBufAllocator</p>
+</blockquote>
+<h4 id="Unpooled-缓冲区"><a href="#Unpooled-缓冲区" class="headerlink" title="Unpooled 缓冲区"></a>Unpooled 缓冲区</h4><p>可能某些情况下，你未能获取一个到 ByteBufAllocator的引用。对于这种情况，Netty 提供了一个简单的称为 Unpooled 的工具类，它提供了静态的辅助方法来创建未池化的 ByteBuf实例。下表列举了这些中最重要的方法。</p>
+<table>
+<thead>
+<tr>
+<th>名 称</th>
+<th>描 述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>buffer()<br>buffer(int initialCapacity)<br>buffer(int initialCapacity, int maxCapacity)</td>
+<td>返回一个未池化的基于堆内存存储的ByteBuf</td>
+</tr>
+<tr>
+<td>directBuffer()<br>directBuffer(int initialCapacity)<br>directBuffer(int initialCapacity, int maxCapacity)</td>
+<td>返回一个未池化的基于直接内存存储的 ByteBuf</td>
+</tr>
+<tr>
+<td>wrappedBuffer()</td>
+<td>返回一个包装了给定数据的 ByteBuf</td>
+</tr>
+<tr>
+<td>copiedBuffer()</td>
+<td>返回一个复制了给定数据的 ByteBuf</td>
+</tr>
+</tbody></table>
+<p>Unpooled类还使得 ByteBuf同样可用于那些并不需要 Netty 的其他组件的非网络项目，使得其能得益于高性能的可扩展的缓冲区 API</p>
+<h4 id="ByteBufUtil-类"><a href="#ByteBufUtil-类" class="headerlink" title="ByteBufUtil 类"></a>ByteBufUtil 类</h4><p>ByteBufUtil提供了用于操作 ByteBuf的静态的辅助方法。因为这个 API 是通用的，并且和池化无关，所以这些方法已然在分配类的外部实现。</p>
+<p>这些静态方法中最有价值的可能就是 hexdump()方法，它以十六进制的表示形式打印ByteBuf的内容。这在各种情况下都很有用，例如， 出于调试的目的记录 ByteBuf的内容。十六进制的表示通常会提供一个比字节值的直接表示形式更加有用的日志条目，此外，十六进制的版本还可以很容易地转换回实际的字节表示。</p>
+<p>另一个有用的方法是 boolean equals(ByteBuf, ByteBuf)，它被用来判断两个 ByteBuf实例的相等性。如果你实现自己的 ByteBuf子类，你可能会发现 ByteBufUtil的其他有用方法。</p>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>引用计数是一种通过在某个对象所持有的资源不再被其他对象引用时释放该对象所持有的资源来优化内存使用和性能的技术。Netty 在第 4 版中为 ByteBuf和 ByteBufHolder引入了引用计数技术，它们都实现了 interface ReferenceCounted。</p>
+<p>引用计数背后的想法并不是特别的复杂；它主要涉及跟踪到某个特定对象的活动引用的数量。一个 ReferenceCounted实现的实例将通常以活动的引用计数为 1 作为开始。只要引用计数大于 0， 就能保证对象不会被释放。当活动引用的数量减少到 0 时，该实例就会被释放。注意，虽然释放的确切语义可能是特定于实现的，但是至少已经释放的对象应该不可再用了。</p>
+<p>引用计数对于池化实现（如 PooledByteBufAllocator）来说是至关重要的，它降低了内存分配的开销。下面两段代码展示了相关的示例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Channel</span> <span class="variable">channel</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// 从 Channel 获取 ByteBufAllocator</span></span><br><span class="line"><span class="type">ByteBufAllocator</span> <span class="variable">allocator</span> <span class="operator">=</span> channel.alloc();</span><br><span class="line">....</span><br><span class="line"><span class="comment">// 从 ByteBufAllocator分配一个 ByteBuf</span></span><br><span class="line"><span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> allocator.directBuffer();</span><br><span class="line"><span class="comment">// 检查引用计数是否为预期的 1</span></span><br><span class="line"><span class="keyword">assert</span> buffer.refCnt() == <span class="number">1</span>;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// 减少到该对象的活动引用。 当减少到 0 时，该对象被释放，并且该方法返回 true</span></span><br><span class="line"><span class="type">boolean</span> <span class="variable">released</span> <span class="operator">=</span> buffer.release();</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>试图访问一个已经被释放的引用计数的对象，将会导致一个 IllegalReferenceCount-Exception。</p>
+<p>注意，一个特定的（ReferenceCounted的实现）类，可以用它自己的独特方式来定义它的引用计数规则。例如，我们可以设想一个类，其 release()方法的实现总是将引用计数设为零，而不用关心它的当前值，从而一次性地使所有的活动引用都失效。</p>
+<blockquote>
+<p><strong>谁负责释放</strong> </p>
+<p>一般来说，是由最后访问（引用计数）对象的那一方来负责将它释放。</p>
+</blockquote>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">LemonGo97</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog.lemongo97.com/posts/83ca1653/">https://blog.lemongo97.com/posts/83ca1653/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog.lemongo97.com" target="_blank">LemonGo97のBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Netty/">Netty</a></div><div class="post_share"><div class="social-share" data-image="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/8f98c3de/"><img class="prev-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Netty In Action -- ChannelHandler 和 ChannelPipeline</div></div></a></div><div class="next-post pull-right"><a href="/posts/dc761a4c/"><img class="next-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Netty In Action -- 传输</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/posts/d8676d75/" title="Netty In Action -- Netty的组件和设计"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- Netty的组件和设计</div></div></a></div><div class="relatedPosts_item"><a href="/posts/dc761a4c/" title="Netty In Action -- 传输"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- 传输</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8aef8fee/" title="Netty In Action -- 核心组件"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- 核心组件</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8f98c3de/" title="Netty In Action -- ChannelHandler 和 ChannelPipeline"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- ChannelHandler 和 ChannelPipeline</div></div></a></div><div class="relatedPosts_item"><a href="/posts/7de3e7aa/" title="Curator实现Zookeeper注册中心（官方文档翻译）"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201225124820.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2020-12-24</div><div class="relatedPosts_title">Curator实现Zookeeper注册中心（官方文档翻译）</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8662ab0e/" title="Java 网络编程之 SSL加密连接"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2020-04-06</div><div class="relatedPosts_title">Java 网络编程之 SSL加密连接</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font_plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font_minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    window.valine = new Valine({
+      el: '#vcomment',
+      appId: 'w7vT5VedMPyGHyDYppcacmtw-gzGzoHsz',
+      appKey: 'YxBl09Aj50g5Ld621aydI4pz',
+      placeholder: '来和大家一起讨论吧！',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    });
+    if ('nick,mail') { valine.config.requiredFields= 'nick,mail'.split(',') }
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else $.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js', initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div></div></body></html>

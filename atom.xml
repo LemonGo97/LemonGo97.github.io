@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.lemongo97.com/"/>
-  <updated>2024-04-25T06:11:08.000Z</updated>
+  <updated>2024-05-05T16:18:47.000Z</updated>
   <id>https://blog.lemongo97.com/</id>
   
   <author>
@@ -15,6 +15,151 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Netty In Action -- ChannelHandler 和 ChannelPipeline</title>
+    <link href="https://blog.lemongo97.com/posts/8f98c3de/"/>
+    <id>https://blog.lemongo97.com/posts/8f98c3de/</id>
+    <published>2024-05-05T16:18:47.000Z</published>
+    <updated>2024-05-05T16:18:47.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Netty In Action -- Bytebuf</title>
+    <link href="https://blog.lemongo97.com/posts/83ca1653/"/>
+    <id>https://blog.lemongo97.com/posts/83ca1653/</id>
+    <published>2024-05-05T16:17:49.000Z</published>
+    <updated>2024-05-05T16:17:49.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Netty In Action -- 传输</title>
+    <link href="https://blog.lemongo97.com/posts/dc761a4c/"/>
+    <id>https://blog.lemongo97.com/posts/dc761a4c/</id>
+    <published>2024-05-05T16:15:23.000Z</published>
+    <updated>2024-05-05T16:15:23.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Netty In Action -- Netty的组件和设计</title>
+    <link href="https://blog.lemongo97.com/posts/d8676d75/"/>
+    <id>https://blog.lemongo97.com/posts/d8676d75/</id>
+    <published>2024-05-05T16:14:00.000Z</published>
+    <updated>2024-05-05T16:14:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Netty In Action -- 核心组件</title>
+    <link href="https://blog.lemongo97.com/posts/8aef8fee/"/>
+    <id>https://blog.lemongo97.com/posts/8aef8fee/</id>
+    <published>2024-05-05T16:11:56.000Z</published>
+    <updated>2024-05-05T16:11:56.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
   
   <entry>
     <title>JS逆向-你要学会偷懒「自用油猴脚本」</title>
@@ -390,127 +535,6 @@
     
     
       <category term="Redis" scheme="https://blog.lemongo97.com/tags/Redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>无锁队列的几种实现及其性能对比</title>
-    <link href="https://blog.lemongo97.com/posts/d6459a58/"/>
-    <id>https://blog.lemongo97.com/posts/d6459a58/</id>
-    <published>2023-01-06T09:59:29.000Z</published>
-    <updated>2023-01-06T09:59:29.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>异步编程指北</title>
-    <link href="https://blog.lemongo97.com/posts/44d9a313/"/>
-    <id>https://blog.lemongo97.com/posts/44d9a313/</id>
-    <published>2023-01-06T09:57:25.000Z</published>
-    <updated>2023-01-06T09:57:25.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>从 SVN 到 Git 开发实用命令总结</title>
-    <link href="https://blog.lemongo97.com/posts/5244d648/"/>
-    <id>https://blog.lemongo97.com/posts/5244d648/</id>
-    <published>2023-01-06T09:54:00.000Z</published>
-    <updated>2023-01-06T09:54:00.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="svn" scheme="https://blog.lemongo97.com/tags/svn/"/>
-    
-      <category term="git" scheme="https://blog.lemongo97.com/tags/git/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>探秘 Web 水印技术</title>
-    <link href="https://blog.lemongo97.com/posts/21f1f258/"/>
-    <id>https://blog.lemongo97.com/posts/21f1f258/</id>
-    <published>2023-01-06T09:47:52.000Z</published>
-    <updated>2023-01-06T09:47:52.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>虚拟内存 &amp; I/O &amp; 零拷贝</title>
-    <link href="https://blog.lemongo97.com/posts/8c24d42a/"/>
-    <id>https://blog.lemongo97.com/posts/8c24d42a/</id>
-    <published>2023-01-06T09:44:13.000Z</published>
-    <updated>2023-01-06T09:44:13.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="操作系统" scheme="https://blog.lemongo97.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
     
   </entry>
   

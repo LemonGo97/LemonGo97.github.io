@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Netty In Action -- 核心组件 | LemonGo97のBlog</title><meta name="description" content="Netty是什么？Netty是一个高性能的Java网络编程框架，主要用于开发服务器和客户端应用程序。它为异步和事件驱动的网络应用程序提供了一个易于使用的API。Netty广泛用于多种应用场景，包括高速网络游戏、网络协议服务器、高并发网络服务等。 Netty的主要特点包括：  高性能与高可扩展性：Netty基于事件驱动和非阻塞IO，这使得它能够支持数以万计的并发连接，同时保持高性能。 灵活且易于使用"><meta name="keywords" content="Java,Netty"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/posts/8aef8fee/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="article"><meta property="og:title" content="Netty In Action -- 核心组件"><meta property="og:url" content="https://blog.lemongo97.com/posts/8aef8fee/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="Netty是什么？Netty是一个高性能的Java网络编程框架，主要用于开发服务器和客户端应用程序。它为异步和事件驱动的网络应用程序提供了一个易于使用的API。Netty广泛用于多种应用场景，包括高速网络游戏、网络协议服务器、高并发网络服务等。 Netty的主要特点包括：  高性能与高可扩展性：Netty基于事件驱动和非阻塞IO，这使得它能够支持数以万计的并发连接，同时保持高性能。 灵活且易于使用"><meta property="og:image" content="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><meta property="article:published_time" content="2024-05-05T16:11:56.000Z"><meta property="article:modified_time" content="2024-05-05T16:11:56.000Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isSidebar: true,
+  postUpdate: '2024-05-06 00:11:56'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">60</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">39</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">4</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div id="sidebar"><i class="fas fa-arrow-right on" id="toggle-sidebar"></i><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Netty%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">Netty是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Netty%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="toc-number">2.</span> <span class="toc-text">Netty核心组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Channel"><span class="toc-number">2.1.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9E%E8%B0%83"><span class="toc-number">2.2.</span> <span class="toc-text">回调</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Future"><span class="toc-number">2.3.</span> <span class="toc-text">Future</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E5%92%8C-ChannelHandler"><span class="toc-number">2.4.</span> <span class="toc-text">事件和 ChannelHandler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">2.5.</span> <span class="toc-text">小结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Future%E3%80%81%E5%9B%9E%E8%B0%83%E5%92%8C-ChannelHandler"><span class="toc-number">2.5.1.</span> <span class="toc-text">Future、回调和 ChannelHandler</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%89%E6%8B%A9%E5%99%A8%E3%80%81%E4%BA%8B%E4%BB%B6%E5%92%8C-EventLoop"><span class="toc-number">2.5.2.</span> <span class="toc-text">选择器、事件和 EventLoop</span></a></li></ol></li></ol></li></ol></div></div></div><header class="post-bg" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><div id="post-title"><div class="posttitle">Netty In Action -- 核心组件</div></div><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-05-05T16:11:56.000Z" title="发表于 2024-05-06 00:11:56">2024-05-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-05-05T16:11:56.000Z" title="更新于 2024-05-06 00:11:56">2024-05-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Netty/">Netty</a></span></div><div class="meta-secondline"> </div></div></div></header><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><h2 id="Netty是什么？"><a href="#Netty是什么？" class="headerlink" title="Netty是什么？"></a>Netty是什么？</h2><p>Netty是一个高性能的Java网络编程框架，主要用于开发服务器和客户端应用程序。它为异步和事件驱动的网络应用程序提供了一个易于使用的API。Netty广泛用于多种应用场景，包括高速网络游戏、网络协议服务器、高并发网络服务等。</p>
+<p>Netty的主要特点包括：</p>
+<ul>
+<li>高性能与高可扩展性：Netty基于事件驱动和非阻塞IO，这使得它能够支持数以万计的并发连接，同时保持高性能。</li>
+<li>灵活且易于使用的API：Netty的API设计考虑到了易用性和灵活性，使开发者可以轻松地创建和扩展自己的网络应用。</li>
+<li>安全性：Netty支持多种加密协议，包括SSL/TLS，确保网络通信的安全性。</li>
+<li>丰富的协议支持：Netty提供了对多种协议的支持，如HTTP, FTP, SMTP, WebSocket等。</li>
+<li>内存管理：Netty实现了高效的内存管理机制，减少内存的频繁分配和回收，优化了资源的使用。</li>
+</ul>
+<h2 id="Netty核心组件"><a href="#Netty核心组件" class="headerlink" title="Netty核心组件"></a>Netty核心组件</h2><h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><p>Channel 是 Java NIO 的一个基本构造。</p>
+<blockquote>
+<p>它代表一个到实体（如一个硬件设备、一个文件、一个网络套接字或者一个能够执行一个或者多个不同的 I/O 操作的程序组件）的开放连接，如读操作和写操作<code>java.nio.channels</code></p>
+</blockquote>
+<p>可以把 Channel看作是传入（入站）或者传出（出站）数据的载体。因此，它可以被打开或者被关闭，连接或者断开连接。</p>
+<h3 id="回调"><a href="#回调" class="headerlink" title="回调"></a>回调</h3><p>一个回调其实就是一个方法，一个指向已经被提供给另外一个方法的方法的引用。这使得后者②可以在适当的时候调用前者。回调在广泛的编程场景中都有应用，而且也是在操作完成后通知相关方最常见的方式之一。</p>
+<p>Netty 在内部使用了回调来处理事件；当一个回调被触发时，相关的事件可以被一个 interface <code>ChannelHandler</code>的实现处理。下面的代码展示了一个例子：当一个新的连接已经被建立时，</p>
+<p><code>ChannelHandler</code> 的 <code>channelActive()</code> 回调方法将会被调用，并将打印出一条信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConnectHandler</span> <span class="keyword">extends</span> <span class="title class_">ChannelInboundHandlerAdapter</span> &#123;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 当一个新的连接已经被建立时，channelActive(ChannelHandler Context)将会被调用</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Client &quot;</span> + ctx.channel().remoteAddress() + <span class="string">&quot; connected&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h3><p>Future提供了另一种在操作完成时通知应用程序的方式。这个对象可以看作是一个异步操作的结果的占位符；它将在未来的某个时刻完成，并提供对其结果的访问。</p>
+<p>JDK 预置了 <code>interface java.util.concurrent.Future</code>，但是其所提供的实现，只允许手动检查对应的操作是否已经完成， 或者一直阻塞直到它完成。 这是非常烦琐的， 所以 Netty提供了它自己的实现——<code>ChannelFuture</code>，用于在执行异步操作的时候使用。</p>
+<p><code>ChannelFuture</code> 提供了几种额外的方法，这些方法使得我们能够注册一个或者多个<code>ChannelFutureListener</code> 实例。监听器的回调方法 <code>operationComplete()</code>，将会在对应的操作完成时被调用(如果在 <code>ChannelFutureListener</code>添加到 <code>ChannelFuture</code>的时候，<code>ChannelFuture</code>已经完成，那么该 <code>ChannelFutureListener</code> 将会被直接地通知。)。然后监听器可以判断该操作是成功地完成了还是出错了。如果是后者，我们可以检索产生的 <code>Throwable</code>。简而言之，由 <code>ChannelFutureListener</code>提供的通知机制消除了手动检查对应的操作是否完成的必要。</p>
+<p>每个 Netty 的出站 I/O 操作都将返回一个 <code>ChannelFuture</code>；也就是说，它们都不会阻塞。</p>
+<p>下面展示了一个 <code>ChannelFuture</code>作为一个 I/O 操作的一部分返回的例子。这里，<code>connect()</code>方法将会直接返回，而不会阻塞，该调用将会在后台完成。这究竟什么时候会发生则取决于若干的因素，但这个关注点已经从代码中抽象出来了。因为线程不用阻塞以等待对应的操作完成，所以它可以同时做其他的工作，从而更加有效地利用资源。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 异步地连接到远程节点</span></span><br><span class="line"><span class="type">Channel</span> <span class="variable">channel</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// Does not block</span></span><br><span class="line"><span class="type">ChannelFuture</span> <span class="variable">future</span> <span class="operator">=</span> channel.connect(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(<span class="string">&quot;192.168.0.1&quot;</span>, <span class="number">25</span>));</span><br></pre></td></tr></table></figure>
+
+<p>下面这个例子显示了如何利用 <code>ChannelFutureListener</code>。首先，要连接到远程节点上。然后，要注册一个新的 <code>ChannelFutureListener</code> 到对 <code>connect()</code>方法的调用所返回的 <code>ChannelFuture</code>上。当该监听器被通知连接已经建立的时候，要检查对应的状态 。如果该操作是成功的，那么将数据写到该 <code>Channel</code>。否则，要从 <code>ChannelFuture</code> 中检索对应的 <code>Throwable</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Channel</span> <span class="variable">channel</span> <span class="operator">=</span> ...;</span><br><span class="line"><span class="comment">// Does not block</span></span><br><span class="line"><span class="type">ChannelFuture</span> <span class="variable">future</span> <span class="operator">=</span> channel.connect(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(<span class="string">&quot;192.168.0.1&quot;</span>, <span class="number">25</span>));</span><br><span class="line">future.addListener(<span class="keyword">new</span> <span class="title class_">ChannelFutureListener</span>() &#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">operationComplete</span><span class="params">(ChannelFuture future)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (future.isSuccess())&#123;</span><br><span class="line">      <span class="type">ByteBuf</span> <span class="variable">buffer</span> <span class="operator">=</span> Unpooled.copiedBuffer(</span><br><span class="line">      <span class="string">&quot;Hello&quot;</span>,Charset.defaultCharset());</span><br><span class="line">      <span class="type">ChannelFuture</span> <span class="variable">wf</span> <span class="operator">=</span> future.channel().writeAndFlush(buffer);</span><br><span class="line">      <span class="comment">// ....</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="type">Throwable</span> <span class="variable">cause</span> <span class="operator">=</span> future.cause();</span><br><span class="line">      cause.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，对错误的处理完全取决于你、目标，当然也包括目前任何对于特定类型的错误加以的限制。例如，如果连接失败，你可以尝试重新连接或者建立一个到另一个远程节点的连接。</p>
+<p>如果你把 <code>ChannelFutureListener</code> 看作是回调的一个更加精细的版本，那么你是对的。事实上，回调和 <code>Future</code>是相互补充的机制；它们相互结合，构成了 Netty 本身的关键构件块之一。</p>
+<h3 id="事件和-ChannelHandler"><a href="#事件和-ChannelHandler" class="headerlink" title="事件和 ChannelHandler"></a>事件和 ChannelHandler</h3><p>Netty 使用不同的事件来通知我们状态的改变或者是操作的状态。这使得我们能够基于已经发生的事件来触发适当的动作。这些动作可能是：</p>
+<ul>
+<li>记录日志；</li>
+<li>数据转换；</li>
+<li>流控制；</li>
+<li>应用程序逻辑。</li>
+</ul>
+<p>Netty 是一个网络编程框架，所以事件是按照它们与入站或出站数据流的相关性进行分类的。可能由入站数据或者相关的状态更改而触发的事件包括：</p>
+<ul>
+<li>连接已被激活或者连接失活；</li>
+<li>数据读取；</li>
+<li>用户事件；</li>
+<li>错误事件。</li>
+</ul>
+<p>出站事件是未来将会触发的某个动作的操作结果，这些动作包括：</p>
+<ul>
+<li>打开或者关闭到远程节点的连接；</li>
+<li>将数据写到或者冲刷到套接字。</li>
+</ul>
+<p>每个事件都可以被分发给 <code>ChannelHandler</code>类中的某个用户实现的方法。这是一个很好的将事件驱动范式直接转换为应用程序构件块的例子。下图展示了一个事件是如何被一个这样的<code>ChannelHandler</code>链处理的。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240429131017713.png" alt="流经 ChannelHandler 链的入站事件和出站事件" style="zoom: 33%;" />
+
+<p>Netty 的 <code>ChannelHandler</code> 为处理器提供了基本的抽象，如上图所示的那些。我们会在适当的时候对 <code>ChannelHandler</code> 进行更多的说明，但是目前你可以认为每个 <code>ChannelHandler</code> 的实例都类似于一种为了响应特定事件而被执行的回调。</p>
+<p>Netty 提供了大量预定义的可以开箱即用的 <code>ChannelHandler</code> 实现，包括用于各种协议（如 HTTP 和 SSL/TLS）的 <code>ChannelHandler</code>。在内部，<code>ChannelHandler</code>自己也使用了事件和 <code>Future</code>，使得它们也成了你的应用程序将使用的相同抽象的消费者。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><h4 id="Future、回调和-ChannelHandler"><a href="#Future、回调和-ChannelHandler" class="headerlink" title="Future、回调和 ChannelHandler"></a><code>Future</code>、回调和 <code>ChannelHandler</code></h4><p>Netty 的异步编程模型是建立在 <code>Future</code>和回调的概念之上的， 而将事件派发到 <code>ChannelHandler</code> 的方法则发生在更深的层次上。结合在一起，这些元素就提供了一个处理环境，使你的应用程序逻辑可以独立于任何网络操作相关的顾虑而独立地演变。这也是 Netty 的设计方式的一个关键目标。</p>
+<p>拦截操作以及高速地转换入站数据和出站数据， 都只需要你提供回调或者利用操作所返回的<code>Future</code>。这使得链接操作变得既简单又高效，并且促进了可重用的通用代码的编写。</p>
+<h4 id="选择器、事件和-EventLoop"><a href="#选择器、事件和-EventLoop" class="headerlink" title="选择器、事件和 EventLoop"></a>选择器、事件和 EventLoop</h4><p>Netty 通过触发事件将 <code>Selector</code> 从应用程序中抽象出来，消除了所有本来将需要手动编写</p>
+<p>的派发代码。在内部，将会为每个 <code>Channel</code> 分配一个 <code>EventLoop</code>，用以处理所有事件，包括：</p>
+<ul>
+<li>注册感兴趣的事件；</li>
+<li>将事件派发给 <code>ChannelHandler</code>；</li>
+<li>安排进一步的动作。</li>
+</ul>
+<p><code>EventLoop</code> 本身只由一个线程驱动，其处理了一个 <code>Channel</code> 的所有 I/O 事件，并且在该 <code>EventLoop</code> 的整个生命周期内都不会改变。这个简单而强大的设计消除了你可能有的在 <code>ChannelHandler</code> 实现中需要进行同步的任何顾虑，因此，你可以专注于提供正确的逻辑，用来在有感兴趣的数据要处理的时候执行。如同我们在详细探讨 Netty 的线程模型时将会看到的，该 API 是简单而紧凑的。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">LemonGo97</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog.lemongo97.com/posts/8aef8fee/">https://blog.lemongo97.com/posts/8aef8fee/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog.lemongo97.com" target="_blank">LemonGo97のBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Netty/">Netty</a></div><div class="post_share"><div class="social-share" data-image="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/d8676d75/"><img class="prev-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Netty In Action -- Netty的组件和设计</div></div></a></div><div class="next-post pull-right"><a href="/posts/f2fcb2e7/"><img class="next-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/1619133427852.jpeg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">JS逆向-你要学会偷懒「自用油猴脚本」</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/posts/d8676d75/" title="Netty In Action -- Netty的组件和设计"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- Netty的组件和设计</div></div></a></div><div class="relatedPosts_item"><a href="/posts/dc761a4c/" title="Netty In Action -- 传输"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- 传输</div></div></a></div><div class="relatedPosts_item"><a href="/posts/83ca1653/" title="Netty In Action -- Bytebuf"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- Bytebuf</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8f98c3de/" title="Netty In Action -- ChannelHandler 和 ChannelPipeline"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- ChannelHandler 和 ChannelPipeline</div></div></a></div><div class="relatedPosts_item"><a href="/posts/7de3e7aa/" title="Curator实现Zookeeper注册中心（官方文档翻译）"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/20201225124820.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2020-12-24</div><div class="relatedPosts_title">Curator实现Zookeeper注册中心（官方文档翻译）</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8662ab0e/" title="Java 网络编程之 SSL加密连接"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/default_cover_1.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2020-04-06</div><div class="relatedPosts_title">Java 网络编程之 SSL加密连接</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font_plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font_minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    window.valine = new Valine({
+      el: '#vcomment',
+      appId: 'w7vT5VedMPyGHyDYppcacmtw-gzGzoHsz',
+      appKey: 'YxBl09Aj50g5Ld621aydI4pz',
+      placeholder: '来和大家一起讨论吧！',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    });
+    if ('nick,mail') { valine.config.requiredFields= 'nick,mail'.split(',') }
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else $.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js', initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div></div></body></html>
