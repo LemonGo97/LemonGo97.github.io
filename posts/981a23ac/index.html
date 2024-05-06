@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Netty In Action -- EventLoop和线程模型 | LemonGo97のBlog</title><meta name="description" content="简单地说， 线程模型指定了操作系统、编程语言、框架或者应用程序的上下文中的线程管理的关键方面。显而易见地，如何以及何时创建线程将对应用程序代码的执行产生显著的影响 ，因此开发人员需要理解与不同模型相关的权衡。无论是他们自己选择模型，还是通过采用某种编程语言或者框架隐式地获得它，这都是真实的。 线程模型概述在这一节中， 我们将介绍常见的线程模型，随后将继续讨论 Netty 过去以及当前的线程模型，并"><meta name="keywords" content="Java,Netty"><meta name="author" content="LemonGo97"><meta name="copyright" content="LemonGo97"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.lemongo97.com/posts/981a23ac/"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><meta property="og:type" content="article"><meta property="og:title" content="Netty In Action -- EventLoop和线程模型"><meta property="og:url" content="https://blog.lemongo97.com/posts/981a23ac/"><meta property="og:site_name" content="LemonGo97のBlog"><meta property="og:description" content="简单地说， 线程模型指定了操作系统、编程语言、框架或者应用程序的上下文中的线程管理的关键方面。显而易见地，如何以及何时创建线程将对应用程序代码的执行产生显著的影响 ，因此开发人员需要理解与不同模型相关的权衡。无论是他们自己选择模型，还是通过采用某种编程语言或者框架隐式地获得它，这都是真实的。 线程模型概述在这一节中， 我们将介绍常见的线程模型，随后将继续讨论 Netty 过去以及当前的线程模型，并"><meta property="og:image" content="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><meta property="article:published_time" content="2024-05-06T03:03:14.000Z"><meta property="article:modified_time" content="2024-05-06T03:03:14.000Z"><meta name="twitter:card" content="summary"><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+  }
+}
+
+var getCookies = function (name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+var autoChangeMode = 'false'
+var t = getCookies('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (Cookies.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: false,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false    
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isSidebar: true,
+  postUpdate: '2024-05-06 11:03:14'
+}</script><noscript><style>
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="LemonGo97のBlog" type="application/atom+xml">
+</head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" data-lazy-src="https://coding-net-production-static-ci.codehub.cn/d70d0fa9-08d5-4fc7-ba82-7b73fee22292.jpg?imageMogr2/auto-orient/format/jpeg/cut/700x700x0x0" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">62</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">39</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">4</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div id="sidebar"><i class="fas fa-arrow-right on" id="toggle-sidebar"></i><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">线程模型概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EventLoop-%E6%8E%A5%E5%8F%A3"><span class="toc-number">2.</span> <span class="toc-text">EventLoop 接口</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Netty-4-%E4%B8%AD%E7%9A%84-I-O-%E5%92%8C%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86"><span class="toc-number">2.1.</span> <span class="toc-text">Netty 4 中的 I&#x2F;O 和事件处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Netty-3-%E4%B8%AD%E7%9A%84-I-O-%E6%93%8D%E4%BD%9C"><span class="toc-number">2.2.</span> <span class="toc-text">Netty 3 中的 I&#x2F;O 操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">任务调度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JDK-%E7%9A%84%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6-API"><span class="toc-number">3.1.</span> <span class="toc-text">JDK 的任务调度 API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-EventLoop-%E8%B0%83%E5%BA%A6%E4%BB%BB%E5%8A%A1"><span class="toc-number">3.2.</span> <span class="toc-text">使用 EventLoop 调度任务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="toc-number">4.</span> <span class="toc-text">实现细节</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E7%AE%A1%E7%90%86"><span class="toc-number">4.1.</span> <span class="toc-text">线程管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EventLoop-%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%88%86%E9%85%8D"><span class="toc-number">4.2.</span> <span class="toc-text">EventLoop&#x2F;线程的分配</span></a></li></ol></li></ol></div></div></div><header class="post-bg" id="page-header" style="background-image: url(https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png)"><nav id="nav"><span class="pull-left" id="blog_name"><a class="blog_title" id="site-name" href="/">LemonGo97のBlog</a></span><span class="pull-right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><div id="post-title"><div class="posttitle">Netty In Action -- EventLoop和线程模型</div></div><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-05-06T03:03:14.000Z" title="发表于 2024-05-06 11:03:14">2024-05-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-05-06T03:03:14.000Z" title="更新于 2024-05-06 11:03:14">2024-05-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Netty/">Netty</a></span></div><div class="meta-secondline"> </div></div></div></header><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><p>简单地说， 线程模型指定了操作系统、编程语言、框架或者应用程序的上下文中的线程管理的关键方面。显而易见地，如何以及何时创建线程将对应用程序代码的执行产生显著的影响 ，因此开发人员需要理解与不同模型相关的权衡。无论是他们自己选择模型，还是通过采用某种编程语言或者框架隐式地获得它，这都是真实的。</p>
+<h2 id="线程模型概述"><a href="#线程模型概述" class="headerlink" title="线程模型概述"></a>线程模型概述</h2><p>在这一节中， 我们将介绍常见的线程模型，随后将继续讨论 Netty 过去以及当前的线程模型，并评审它们各自的优点以及局限性。</p>
+<p>正如我们在本章开头所指出的，线程模型确定了代码的执行方式。由于我们总是必须规避并发执行可能会带来的副作用，所以理解所采用的并发模型（也有单线程的线程模型）的影响很重要。忽略这些问题，仅寄希望于最好的情况（不会引发并发问题）。</p>
+<p>因为具有多核心或多个 CPU的计算机现在已经司空见惯，大多数的现代应用程序都利用了复杂的多线程处理技术以有效地利用系统资源。相比之下，在早期的 Java 语言中，我们使用多线程处理的主要方式无非是按需创建和启动新的 Thread 来执行并发的任务单元——一种在高负载下工作得很差的原始方式。Java 5 随后引入了 Executor API，其线程池通过缓存和重用Thread极大地提高了性能。</p>
+<p>基本的线程池化模式可以描述为：</p>
+<ul>
+<li>从池的空闲线程列表中选择一个 Thread，并且指派它去运行一个已提交的任务（一个Runnable的实现）；</li>
+<li>当任务完成时，将该 Thread返回给该列表，使其可被重用。</li>
+</ul>
+<p>下图说明了这个模式：</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240506110553411.png" alt="Executor的执行逻辑" style="zoom:40%;" />
+
+<p>虽然池化和重用线程相对于简单地为每个任务都创建和销毁线程是一种进步，但是它并不能消除由上下文切换所带来的开销， 其将随着线程数量的增加很快变得明显，并且在高负载下愈演愈烈。此外，仅仅由于应用程序的整体复杂性或者并发需求，在项目的生命周期内也可能会出现其他和线程相关的问题。</p>
+<p>简而言之，多线程处理是很复杂的。在接下来的章节中，我们将会看到 Netty 是如何帮助简化它的。</p>
+<h2 id="EventLoop-接口"><a href="#EventLoop-接口" class="headerlink" title="EventLoop 接口"></a>EventLoop 接口</h2><p>运行任务来处理在连接的生命周期内发生的事件是任何网络框架的基本功能。与之相应的编<br>程上的构造通常被称为事件循环—一个 Netty 使用了 interface io.netty.channel.<br>EventLoop来适配的术语。</p>
+<p>下列代码中说明了事件循环的基本思想，其中每个任务都是一个 Runnable的实例（如下图所示）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (!terminated) &#123;</span><br><span class="line">	<span class="comment">// 阻塞，直到有事件已经就绪可被运行</span></span><br><span class="line">	List&lt;Runnable&gt; readyEvents = blockUntilEventsReady();</span><br><span class="line">	<span class="keyword">for</span> (Runnable ev: readyEvents) &#123;</span><br><span class="line">		<span class="comment">// 循环遍历，并处理所有的事件</span></span><br><span class="line">		ev.run();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Netty 的 EventLoop 是协同设计的一部分，它采用了两个基本的 API：并发和网络编程。首先，io.netty.util.concurrent 包构建在 JDK 的 java.util.concurrent包上，用来提供线程执行器。其次， io.netty.channel包中的类，为了与 Channel的事件进行交互，扩展了这些接口/类。下图展示了生成的类层次结构。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240506111028400.png" alt="EventLoop的类层次结构" style="zoom:40%;" />
+
+<p>在这个模型中，一个 EventLoop 将由一个永远都不会改变的 Thread 驱动，同时任务（Runnable 或者 Callable）可以直接提交给 EventLoop实现，以立即执行或者调度执行。根据配置和可用核心的不同，可能会创建多个 EventLoop实例用以优化资源的使用，并且单个EventLoop可能会被指派用于服务多个 Channel。</p>
+<p>需要注意的是，Netty的EventLoop在继承了ScheduledExecutorService的同时，只定义了一个方法， parent()(这个方法重写了 EventExecutor的 EventExecutorGroup.parent()方法)。这个方法，如下面的代码片断所示，用于返回到当前EventLoop实现的实例所属的EventLoopGroup的引用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">EventLoop</span> <span class="keyword">extends</span> <span class="title class_">EventExecutor</span>, EventLoopGroup &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	EventLoopGroup <span class="title function_">parent</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>事件/任务的执行顺序</strong> </p>
+<p>事件和任务是以先进先出（FIFO）的顺序执行的。这样可以通过保证字节内容总是按正确的顺序被处理，消除潜在的数据损坏的可能性。</p>
+</blockquote>
+<h3 id="Netty-4-中的-I-O-和事件处理"><a href="#Netty-4-中的-I-O-和事件处理" class="headerlink" title="Netty 4 中的 I/O 和事件处理"></a>Netty 4 中的 I/O 和事件处理</h3><p>由 I/O 操作触发的事件将流经安装了一个或者多个ChannelHandler的 ChannelPipeline。传播这些事件的方法调用可以随后被 ChannelHandler所拦截，并且可以按需地处理事件。</p>
+<p>事件的性质通常决定了它将被如何处理；它可能将数据从网络栈中传递到你的应用程序中，或者进行逆向操作，或者 执行一些截然不同的操作。但是事件的处理逻辑必须足够的通用和灵活，以处理所有可能的用例。因此，在Netty 4 中，所有的I/O操作和事件都由已经被分配给了EventLoop的那个Thread来处理(这里使用的是“来处理”而不是“来触发”，其中写操作是可以从外部的任意线程触发的) </p>
+<p>这不同于 Netty 3 中所使用的模型。在下一节中，我们将讨论这个早期的模型以及它被替换的原因。</p>
+<h3 id="Netty-3-中的-I-O-操作"><a href="#Netty-3-中的-I-O-操作" class="headerlink" title="Netty 3 中的 I/O 操作"></a>Netty 3 中的 I/O 操作</h3><p>在以前的版本中所使用的线程模型只保证了入站（之前称为上游）事件会在所谓的 I/O 线程（对应于 Netty 4 中的 EventLoop）中执行。所有的出站（下游）事件都由调用线程处理，其可能是 I/O 线程也可能是别的线程。开始看起来这似乎是个好主意，但是已经被发现是有问题的，因为需要在 ChannelHandler中对出站事件进行仔细的同步。 简而言之，不可能保证多个线程不会在同一时刻尝试访问出站事件。例如， 如果你通过在不同的线程中调用 Channel.write()方法，针对同一个 Channel同时触发出站的事件，就会发生这种情况。</p>
+<p>当出站事件触发了入站事件时，将会导致另一个负面影响。当 Channel.write()方法导致异常时，需要生成并触发一个 exceptionCaught事件。 但是在 Netty 3 的模型中，由于这是一个入站事件，需要在调用线程中执行代码，然后将事件移交给 I/O 线程去执行，然而这将带来额外的上下文切换。</p>
+<p>Netty 4 中所采用的线程模型， 通过在同一个线程中处理某个给定的 EventLoop中所产生的所有事件，解决了这个问题。这提供了一个更加简单的执行体系架构，并且消除了在多个ChannelHandler中进行同步的需要（除了任何可能需要在多个 Channel中共享的）。</p>
+<p>现在，已经理解了 EventLoop的角色，让我们来看看任务是如何被调度执行的吧。</p>
+<h2 id="任务调度"><a href="#任务调度" class="headerlink" title="任务调度"></a>任务调度</h2><p>偶尔，你将需要调度一个任务以便稍后（延迟）执行或者周期性地执行。例如，你可能想要注册一个在客户端已经连接了 5 分钟之后触发的任务。一个常见的用例是， 发送心跳消息到远程节点，以检查连接是否仍然还活着。如果没有响应，你便知道可以关闭该 Channel了。</p>
+<p>在接下来的几节中，我们将展示如何使用核心的 Java API 和 Netty 的 EventLoop来调度任务。然后，我们将研究 Netty 的内部实现，并讨论它的优点和局限性。</p>
+<h3 id="JDK-的任务调度-API"><a href="#JDK-的任务调度-API" class="headerlink" title="JDK 的任务调度 API"></a>JDK 的任务调度 API</h3><p>在 Java 5 之前，任务调度是建立在 java.util.Timer类之上的，其使用了一个后台 Thread，并且具有与标准线程相同的限制。随后，JDK 提供了 java.util.concurrent 包，它定义了interface ScheduledExecutorService。下表展示了 java.util.concurrent.Executors的相关工厂方法。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>newScheduledThreadPool(int corePoolSize)<br>newScheduledThreadPool(int corePoolSize, ThreadFactorythreadFactory)</td>
+<td>创建一个 ScheduledThreadExecutorService，用于调度命令在指定延迟之后运行或者周期性地执行。它使用 corePoolSize参数来计算线程数</td>
+</tr>
+<tr>
+<td>newSingleThreadScheduledExecutor()<br>newSingleThreadScheduledExecutor(ThreadFactorythreadFactory)</td>
+<td>创建一个 ScheduledThreadExecutorService，用于调度命令在指定延迟之后运行或者周期性地执行。它使用一个线程来执行被调度的任务</td>
+</tr>
+</tbody></table>
+<p>虽然选择不是很多（由JDK 提供的这个接口的唯一具体实现是java.util.concurrent.ScheduledThreadPoolExecutor），但是这些预置的实现已经足以应对大多数的用例。下列代码展示了如何使用ScheduledExecutorService来在 60 秒的延迟之后执行一个任务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建一个其线程池具有 10 个线程的 ScheduledExecutorService</span></span><br><span class="line"><span class="type">ScheduledExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newScheduledThreadPool(<span class="number">10</span>);</span><br><span class="line">ScheduledFuture&lt;?&gt; future = executor.schedule(</span><br><span class="line">	<span class="comment">// 创建一个 Runnable，以供调度稍后执行</span></span><br><span class="line">	<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// 该任务要打印的消息</span></span><br><span class="line">		System.out.println(<span class="string">&quot;60 seconds later&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment">// 调度任务在从现在开始的 60 秒之后执行</span></span><br><span class="line">&#125;, <span class="number">60</span>, TimeUnit.SECONDS);</span><br><span class="line">...</span><br><span class="line"><span class="comment">// 一旦调度任务执行完成，就关闭 ScheduledExecutorService 以释放资源</span></span><br><span class="line">executor.shutdown();</span><br></pre></td></tr></table></figure>
+
+<p>虽然 ScheduledExecutorService API 是直截了当的，但是在高负载下它将带来性能上的负担。在下一节中，我们将看到 Netty 是如何以更高的效率提供相同的功能的。</p>
+<h3 id="使用-EventLoop-调度任务"><a href="#使用-EventLoop-调度任务" class="headerlink" title="使用 EventLoop 调度任务"></a>使用 EventLoop 调度任务</h3><p>ScheduledExecutorService 的实现具有局限性，例如，事实上作为线程池管理的一部分，将会有额外的线程创建。如果有大量任务被紧凑地调度，那么这将成为一个瓶颈。Netty 通过 Channel的 EventLoop实现任务调度解决了这一问题，如下列代码所示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Channel</span> <span class="variable">ch</span> <span class="operator">=</span></span><br><span class="line">...</span><br><span class="line">ScheduledFuture&lt;?&gt; future = ch.eventLoop().schedule(</span><br><span class="line">	<span class="comment">// 创建一个 Runnable以供调度稍后执行</span></span><br><span class="line">	<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// 要执行的代码</span></span><br><span class="line">		System.out.println(<span class="string">&quot;60 seconds later&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment">// 调度任务在从现在开始的 60 秒之后执行</span></span><br><span class="line">&#125;, <span class="number">60</span>, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
+
+<p>经过 60 秒之后， Runnable实例将由分配给 Channel的 EventLoop执行。如果要调度任务以每隔 60 秒执行一次，请使用 scheduleAtFixedRate()方法，如下列代码所示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Channel</span> <span class="variable">ch</span> <span class="operator">=</span> ...</span><br><span class="line"><span class="comment">// 创建一个 Runnable，以供调度稍后执行</span></span><br><span class="line">ScheduledFuture&lt;?&gt; future = ch.eventLoop().scheduleAtFixedRate(</span><br><span class="line">	<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// 这将一直运行，直到 ScheduledFuture 被取消</span></span><br><span class="line">		System.out.println(<span class="string">&quot;Run every 60 seconds&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment">// 调度在 60 秒之后，并且以后每间隔 60 秒运行</span></span><br><span class="line">&#125;, <span class="number">60</span>, <span class="number">60</span>, TimeUnit.Seconds);</span><br></pre></td></tr></table></figure>
+
+<p>如我们前面所提到的，Netty 的 EventLoop扩展了 ScheduledExecutorService（见上图） ，所以它提供了使用 JDK 实现可用的所有方法，包括在前面的示例中使用到的 schedule()和 scheduleAtFixedRate()方法。 所有操作的完整列表可以在 ScheduledExecutorService的 Javadoc 中找到。</p>
+<p>要想取消或者检查（被调度任务的）执行状态，可以使用每个异步操作所返回的 ScheduledFuture。下列代码展示了一个简单的取消操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调度任务，并获得所返回的 ScheduledFuture</span></span><br><span class="line">ScheduledFuture&lt;?&gt; future = ch.eventLoop().scheduleAtFixedRate(...);</span><br><span class="line"><span class="comment">// Some other code that runs...</span></span><br><span class="line"><span class="type">boolean</span> <span class="variable">mayInterruptIfRunning</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// 取消该任务，防止它再次运行</span></span><br><span class="line">future.cancel(mayInterruptIfRunning);</span><br></pre></td></tr></table></figure>
+
+<p>这些例子说明，可以利用 Netty 的任务调度功能来获得性能上的提升。反过来，这些也依赖于底层的线程模型，我们接下来将对其进行研究。</p>
+<h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2><h3 id="线程管理"><a href="#线程管理" class="headerlink" title="线程管理"></a>线程管理</h3><p>Netty 线程模型的卓越性能取决于对于当前执行的 Thread的身份的确定(通过调用 EventLoop的 inEventLoop(Thread)方法实现)，也就是说，确定它是否是分配给当前 Channel以及它的 EventLoop的那一个线程。 （回想一下 EventLoop将负责处理一个 Channel的整个生命周期内的所有事件。 ）</p>
+<p>如果（当前）调用线程正是支撑 EventLoop的线程，那么所提交的代码块将会被（直接）执行。 否则， EventLoop将调度该任务以便稍后执行， 并将它放入到内部队列中。 当 EventLoop下次处理它的事件时，它会执行队列中的那些任务/事件。这也就解释了任何的 Thread 是如何与 Channel直接交互而无须在 ChannelHandler中进行额外同步的。</p>
+<p>注意，每个 EventLoop 都有它自己的任务队列，独立于任何其他的 EventLoop。下图展示了 EventLoop用于调度任务的执行逻辑。这是 Netty 线程模型的关键组成部分。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240506115303360.png" alt="EventLoop的执行逻辑" style="zoom:40%;" />
+
+<p>我们之前已经阐明了不要阻塞当前 I/O 线程的重要性。我们再以另一种方式重申一次： “永远不要将一个长时间运行的任务放入到执行队列中， 因为它将阻塞需要在同一线程上执行的任何其他任务。 ”如果必须要进行阻塞调用或者执行长时间运行的任务，我们建议使用一个专门的EventExecutor。</p>
+<p>除了这种受限的场景，如同传输所采用的不同的事件处理实现一样，所使用的线程模型也可以强烈地影响到排队的任务对整体系统性能的影响。 （使用 Netty可以轻松地切换到不同的传输实现，而不需要修改你的代码库。 ）</p>
+<h3 id="EventLoop-线程的分配"><a href="#EventLoop-线程的分配" class="headerlink" title="EventLoop/线程的分配"></a>EventLoop/线程的分配</h3><p>服务于 Channel的 I/O 和事件的 EventLoop包含在 EventLoopGroup中。根据不同的传输实现，EventLoop的创建和分配方式也不同。</p>
+<p><strong>异步传输</strong></p>
+<p>异步传输实现只使用了少量的 EventLoop（以及和它们相关联的 Thread） ，而且在当前的线程模型中，它们可能会被多个 Channel所共享。这使得可以通过尽可能少量的 Thread来支撑大量的 Channel，而不是每个 Channel分配一个 Thread。</p>
+<p>下图显示了一个 EventLoopGroup，它具有 3 个固定大小的 EventLoop（每个 EventLoop都由一个 Thread支撑）。在创建 EventLoopGroup时就直接分配了 EventLoop（以及支撑它们的 Thread），以确保在需要时它们是可用的。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240506124345655.png" alt="用于非阻塞传输（如 NIO 和 AIO）的 EventLoop分配方式" style="zoom:33%;" />
+
+<p>EventLoopGroup负责为每个新创建的 Channel分配一个 EventLoop。在当前实现中，使用顺序循环（round-robin）的方式进行分配以获取一个均衡的分布，并且相同的 EventLoop可能会被分配给多个 Channel。（这一点在将来的版本中可能会改变。）</p>
+<p>一旦一个 Channel 被分配给一个 EventLoop，它将在它的整个生命周期中都使用这个EventLoop（以及相关联的 Thread）。请牢记这一点，因为它可以使你从担忧你的 ChannelHandler实现中的线程安全和同步问题中解脱出来。</p>
+<p>另外，需要注意的是，EventLoop的分配方式对 ThreadLocal的使用的影响。因为一个EventLoop 通常会被用于支撑多个 Channel，所以对于所有相关联的 Channel 来说，ThreadLocal都将是一样的。这使得它对于实现状态追踪等功能来说是个糟糕的选择。然而，在一些无状态的上下文中，它仍然可以被用于在多个 Channel之间共享一些重度的或者代价昂贵的对象，甚至是事件。</p>
+<p><strong>阻塞传输</strong></p>
+<p>用于像 OIO（旧的阻塞 I/O）这样的其他传输的设计略有不同，如下图所示。</p>
+<p>这里每一个 Channel都将被分配给一个 EventLoop（以及它的 Thread）。如果你开发的应用程序使用过 java.io包中的阻塞 I/O 实现，你可能就遇到过这种模型。</p>
+<img src= "/img/loading.gif" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/image-20240506124616894.png" alt="阻塞传输（如 OIO）的 EventLoop分配方式" style="zoom:33%;" />
+
+<p>但是，正如同之前一样，得到的保证是每个 Channel 的 I/O 事件都将只会被一个 Thread（用于支撑该 Channel的 EventLoop的那个 Thread）处理。这也是另一个 Netty 设计一致性的例子，它（这种设计上的一致性）对 Netty 的可靠性和易用性做出了巨大贡献。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">LemonGo97</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog.lemongo97.com/posts/981a23ac/">https://blog.lemongo97.com/posts/981a23ac/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog.lemongo97.com" target="_blank">LemonGo97のBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Netty/">Netty</a></div><div class="post_share"><div class="social-share" data-image="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/599662bc/"><img class="prev-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Netty In Action -- BootStrap</div></div></a></div><div class="next-post pull-right"><a href="/posts/8f98c3de/"><img class="next-cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Netty In Action -- ChannelHandler 和 ChannelPipeline</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/posts/d8676d75/" title="Netty In Action -- Netty的组件和设计"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- Netty的组件和设计</div></div></a></div><div class="relatedPosts_item"><a href="/posts/dc761a4c/" title="Netty In Action -- 传输"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- 传输</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8aef8fee/" title="Netty In Action -- 核心组件"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- 核心组件</div></div></a></div><div class="relatedPosts_item"><a href="/posts/599662bc/" title="Netty In Action -- BootStrap"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- BootStrap</div></div></a></div><div class="relatedPosts_item"><a href="/posts/83ca1653/" title="Netty In Action -- Bytebuf"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- Bytebuf</div></div></a></div><div class="relatedPosts_item"><a href="/posts/8f98c3de/" title="Netty In Action -- ChannelHandler 和 ChannelPipeline"><img class="relatedPosts_cover" data-lazy-src="https://lemongo97-blog-img.oss-cn-beijing.aliyuncs.com/Snipaste_2024-05-06_00-33-28%202.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-06</div><div class="relatedPosts_title">Netty In Action -- ChannelHandler 和 ChannelPipeline</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By LemonGo97</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font_plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font_minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div><script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/instant.page/5.1.0/instantpage.min.js" type="module" defer></script><script src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.3.1/lazyload.iife.min.js" async></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    window.valine = new Valine({
+      el: '#vcomment',
+      appId: 'w7vT5VedMPyGHyDYppcacmtw-gzGzoHsz',
+      appKey: 'YxBl09Aj50g5Ld621aydI4pz',
+      placeholder: '来和大家一起讨论吧！',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    });
+    if ('nick,mail') { valine.config.requiredFields= 'nick,mail'.split(',') }
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else $.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js', initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div></div></body></html>

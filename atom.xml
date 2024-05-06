@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.lemongo97.com/"/>
-  <updated>2024-05-05T16:18:47.000Z</updated>
+  <updated>2024-05-06T06:19:39.000Z</updated>
   <id>https://blog.lemongo97.com/</id>
   
   <author>
@@ -15,6 +15,64 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Netty In Action -- BootStrap</title>
+    <link href="https://blog.lemongo97.com/posts/599662bc/"/>
+    <id>https://blog.lemongo97.com/posts/599662bc/</id>
+    <published>2024-05-06T06:19:39.000Z</published>
+    <updated>2024-05-06T06:19:39.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Netty In Action -- EventLoop和线程模型</title>
+    <link href="https://blog.lemongo97.com/posts/981a23ac/"/>
+    <id>https://blog.lemongo97.com/posts/981a23ac/</id>
+    <published>2024-05-06T03:03:14.000Z</published>
+    <updated>2024-05-06T03:03:14.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/categories/Netty/"/>
+    
+    
+      <category term="Java" scheme="https://blog.lemongo97.com/tags/Java/"/>
+    
+      <category term="Netty" scheme="https://blog.lemongo97.com/tags/Netty/"/>
+    
+  </entry>
   
   <entry>
     <title>Netty In Action -- ChannelHandler 和 ChannelPipeline</title>
@@ -487,54 +545,6 @@
     
     
       <category term="tcp" scheme="https://blog.lemongo97.com/tags/tcp/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>分布式唯一 ID 生成方案浅谈</title>
-    <link href="https://blog.lemongo97.com/posts/ad0e1ee3/"/>
-    <id>https://blog.lemongo97.com/posts/ad0e1ee3/</id>
-    <published>2023-01-07T15:54:13.000Z</published>
-    <updated>2023-01-07T15:54:13.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Redis 知识总结</title>
-    <link href="https://blog.lemongo97.com/posts/d422a896/"/>
-    <id>https://blog.lemongo97.com/posts/d422a896/</id>
-    <published>2023-01-07T15:43:48.000Z</published>
-    <updated>2023-01-07T15:43:48.000Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="Redis" scheme="https://blog.lemongo97.com/tags/Redis/"/>
     
   </entry>
   
