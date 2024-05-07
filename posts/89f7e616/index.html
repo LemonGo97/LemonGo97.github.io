@@ -123,19 +123,19 @@ if (autoChangeMode === '1') {
 </tr>
 </thead>
 <tbody><tr>
-<td>setHandshakeTimeout (long,TimeUnit)<br>setHandshakeTimeoutMillis (long)<br>getHandshakeTimeoutMillis()</td>
+<td><code>setHandshakeTimeout (long,TimeUnit)</code><br><code>setHandshakeTimeoutMillis (long)</code><br><code>getHandshakeTimeoutMillis()</code></td>
 <td>设置和获取超时时间，超时之后，握手<code>ChannelFuture</code>将会被通知失败</td>
 </tr>
 <tr>
-<td>setCloseNotifyTimeout (long,TimeUnit)<br>setCloseNotifyTimeoutMillis (long)<br>getCloseNotifyTimeoutMillis()</td>
+<td><code>setCloseNotifyTimeout (long,TimeUnit)</code><br><code>setCloseNotifyTimeoutMillis (long)</code><br><code>getCloseNotifyTimeoutMillis()</code></td>
 <td>设置和获取超时时间，超时之后，将会触发一个关闭通知并关闭连接。这也将会导致通知该 <code>ChannelFuture</code>失败</td>
 </tr>
 <tr>
-<td>handshakeFuture()</td>
+<td><code>handshakeFuture()</code></td>
 <td>返回一个在握手完成后将会得到通知的<code>ChannelFuture</code>。如果握手先前已经执行过了，则返回一个包含了先前的握手结果的 <code>ChannelFuture</code></td>
 </tr>
 <tr>
-<td>close()<br>close(ChannelPromise)<br>close(ChannelHandlerContext,ChannelPromise)</td>
+<td><code>close()</code><br><code>close(ChannelPromise)</code><br><code>close(ChannelHandlerContext,ChannelPromise)</code></td>
 <td>发送 <code>close_notify</code>以请求关闭并销毁底层的 <code>SslEngine</code></td>
 </tr>
 </tbody></table>
